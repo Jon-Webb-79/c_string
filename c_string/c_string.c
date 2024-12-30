@@ -97,7 +97,7 @@ const char* get_string(const string_t* str) {
 const size_t string_size(const string_t* str) {
     if (!str || !str->str) {
         errno = EINVAL;
-        return -1;
+        return LONG_MAX;
     }
     return str->len;
 }
@@ -106,7 +106,7 @@ const size_t string_size(const string_t* str) {
 const size_t string_alloc(const string_t* str) {
     if (!str || !str->str) {
         errno = EINVAL;
-        return -1;
+        return LONG_MAX;
     }
     return str->alloc;
 }
@@ -135,7 +135,7 @@ bool string_string_concat(string_t* str1, const string_t* str2) {
     }
 
     // Append the second string to the first
-    strcat(str1->str, str2->str);
+    strncat(str1->str, str2->str, str2->len);
 
     // Update the length of the first string
     str1->len = new_len;
@@ -167,7 +167,7 @@ bool string_lit_concat(string_t* str1, const char* literal) {
     }
 
     // Append the string literal to the first string
-    strcat(str1->str, literal);
+    strncat(str1->str, literal, literal_len);
 
     // Update the length of the first string
     str1->len = new_len;
@@ -215,7 +215,7 @@ int compare_strings_string(const string_t* str_struct_one, string_t* str_struct_
 string_t* copy_string(const string_t* str) {
     if (!str || !str->str) {
         errno = EINVAL;
-        return false;
+        return NULL;
     }
     string_t* new_str = init_string(get_string(str));
     if (new_str->alloc < str->alloc) 

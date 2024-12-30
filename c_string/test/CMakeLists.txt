@@ -14,10 +14,10 @@
 # Create the test executable using unit_test.c and test_hello.c
 add_executable(unit_tests
 	unit_test.c
-	test_hello.c)
+	test_string.c)
 
 # Link the test executable against the Hello library and cmocka
-target_link_libraries(unit_tests cstring cmocka)
+target_link_libraries(unit_tests c_string cmocka)
 
 # Register the unit_tests executable as a test for CTest
 add_test(NAME unit_tests COMMAND unit_test)

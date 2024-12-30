@@ -19,14 +19,20 @@
 #include <stdint.h>
 #include <cmocka.h>
 
-#include "test.h"
-
+#include "test_string.h"
+// ================================================================================ 
+// ================================================================================
 // Begin code
+
 int main(int argc, const char * argv[]) {
-	const struct CMUnitTest test_one[] = {
-		cmocka_unit_test(test_funct)
+	const struct CMUnitTest test_string[] = {
+        cmocka_unit_test(test_init_string_nominal),
+        cmocka_unit_test(test_init_string_empty),
+        cmocka_unit_test(test_init_string_null),
+        cmocka_unit_test(test_free_string_nominal),
+        cmocka_unit_test(test_free_string_null),
 	};
-	return cmocka_run_group_tests(test_one, NULL, NULL);
+	return cmocka_run_group_tests(test_string, NULL, NULL);
 }
 // ================================================================================
 // ================================================================================

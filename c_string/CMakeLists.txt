@@ -11,12 +11,10 @@
 # ================================================================================
 # ================================================================================
 cmake_minimum_required(VERSION 3.31.3)
-project(cstring)
+project(c_string)
 
-# Set the compiler (Optional)
-# set(CMAKE_C_COMPILER "/usr/bin/gcc")
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 enable_testing()
@@ -26,18 +24,17 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wpedantic")
 endif()
 
-# Define the library
-add_library(cstring
-	hello.c)
-target_include_directories(Hello PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Add the `endf` library
+add_library(c_string
+            c_string.c
+)
 
-# Define the tests
-add_executable(unit_tests
-	test/unit_test.c
-	test/test_hello.c)
-target_link_libraries(unit_tests cstring cmocka)
-add_test(NAME unit_tests COMMAND unit_test)
+# Link against jansson
 
+target_include_directories(c_string PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/c_string/include)
+
+# Add the test directory
+add_subdirectory(test)
 # ================================================================================
 # ================================================================================
 # eof
