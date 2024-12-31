@@ -1,8 +1,8 @@
 #!/usr/bin/zsh
 # ================================================================================
 # ================================================================================
-# - File:    compile.zsh
-# - Purpose: This file contains a script that will compile C and C++ code
+# - File:    release.zsh
+# - Purpose: This file contains a script that will build c and c++ software
 #            using CMake
 #
 # Source Metadata
@@ -13,7 +13,8 @@
 # ================================================================================
 # ================================================================================
 
-cmake --build ../../cstring/build/
+cmake -S ../../c_string/ -B ../../c_string/build/debug/ -DCMAKE_BUILD_TYPE=Debug
+cmake --build ../../c_string/build/debug/
 # ================================================================================
 # ================================================================================
 # eof
