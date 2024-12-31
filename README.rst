@@ -33,7 +33,7 @@ The library's encapsulated design prevents common string-related bugs while
 maintaining the performance characteristics expected in C programs.
 
 This project enapsulates its funcitonality into the ``c_string.h`` header file, 
-which is wrapped in the header guard #ifdef __cplusplus which allows it to be 
+which is wrapped in the header guard ``#ifdef __cplusplus`` which allows it to be 
 compiled with C++ as well as C
 
 Contributing
