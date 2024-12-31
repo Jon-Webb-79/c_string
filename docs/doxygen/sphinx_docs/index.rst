@@ -43,7 +43,7 @@ compiled with C++ as well as C
    :maxdepth: 2
    :caption: Contents:
 
-   module <module>
+   C Strings <String>
 
 Indices and tables
 ==================
