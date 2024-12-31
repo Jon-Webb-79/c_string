@@ -313,6 +313,71 @@ void test_compare_strings_case_sensitivity(void **state) {
     free_string(str1);
     free_string(str2);
 }
+// --------------------------------------------------------------------------------
+/* Test cases for copy_string and reserve_string */
+void test_copy_string_nominal(void **state) {
+    string_t* str1 = init_string("hello world");
+    string_t* str2 = copy_string(str1);
+   
+    assert_non_null(str2);
+    assert_string_equal(get_string(str2), get_string(str1));
+    assert_int_equal(string_size(str2), string_size(str1));
+    assert_int_equal(string_alloc(str2), string_alloc(str1));
+   
+    free_string(str1);
+    free_string(str2);
+}
+// --------------------------------------------------------------------------------
+
+void test_copy_string_empty(void **state) {
+    string_t* str1 = init_string("");
+    string_t* str2 = copy_string(str1);
+   
+    assert_non_null(str2);
+    assert_string_equal(get_string(str2), "");
+    assert_int_equal(string_size(str2), 0);
+    assert_int_equal(string_alloc(str2), 1);
+   
+    free_string(str1);
+    free_string(str2);
+}
+// --------------------------------------------------------------------------------
+
+void test_copy_string_null(void **state) {
+    string_t* str = copy_string(NULL);
+    assert_null(str);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_reserve_string_nominal(void **state) {
+    string_t* str = init_string("test");
+    assert_true(reserve_string(str, 20));
+    
+    assert_int_equal(string_alloc(str), 20);
+    assert_string_equal(get_string(str), "test");  // Verify content unchanged
+    assert_int_equal(string_size(str), 4);         // Verify length unchanged
+   
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_reserve_string_smaller_size(void **state) {
+   string_t* str = init_string("test");
+   size_t original_alloc = string_alloc(str);
+   
+   assert_false(reserve_string(str, 2));  // Should fail when trying to reserve less space
+   assert_int_equal(errno, EINVAL);
+   assert_int_equal(string_alloc(str), original_alloc);  // Allocation should be unchanged
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_reserve_string_null(void **state) {
+   assert_false(reserve_string(NULL, 10));
+   assert_int_equal(errno, EINVAL);
+}
 // ================================================================================
 // ================================================================================
 // eof
