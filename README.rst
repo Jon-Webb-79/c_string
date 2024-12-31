@@ -29,7 +29,12 @@ This library is particularly useful when:
 * Requiring safe string manipulation in security-sensitive contexts
 * Managing multiple string operations with minimal memory overhead
 
-The library's encapsulated design prevents common string-related bugs while maintaining the performance characteristics expected in C programs.
+The library's encapsulated design prevents common string-related bugs while 
+maintaining the performance characteristics expected in C programs.
+
+.. note: This project enapsulates its funcitonality into the ``c_string.h`` header file, which is wrapped in the header guard #ifdef __cplusplus which allows it to be compiled with C++ as well as C
+extern "C" {
+#endif
 
 Contributing
 ############
