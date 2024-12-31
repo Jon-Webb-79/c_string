@@ -19,7 +19,7 @@ The c_string library addresses these challenges by providing a dynamic string ty
 * Prevents direct buffer access to avoid memory corruption
 
 When to Use This Library
------------------------
+########################
 
 This library is particularly useful when:
 
