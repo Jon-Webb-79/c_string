@@ -1,5 +1,5 @@
 ********
-c_string
+C String
 ********
 
 C's built-in string handling, based on null-terminated character arrays, while efficient for simple operations, presents several challenges in modern software development:
@@ -44,7 +44,7 @@ as well as relevant doc-string and sphinx updates.
 
 License
 #######
-The License is included in the **project_name** package
+The License is included in the **c_string** package
 
 Requirements
 ############
@@ -86,7 +86,7 @@ In order to download this repository from github, follow these instructions
       # If using zsh 
       zsh debug.zsh
 
-#. Navigate to ``csalt/csalt/build/debug`` to run unit tests 
+#. Navigate to ``c_string/c_string/build/debug`` to run unit tests 
 
    .. code-block:: bash 
 

@@ -3,10 +3,41 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to XXXX documentation!
-==============================
-Say something about your code base here
+Welcome to C String documentation!
+==================================
+C's built-in string handling, based on null-terminated character arrays, while efficient for simple operations, presents several challenges in modern software development:
 
+* Fixed buffer sizes require precise size calculations to prevent buffer overflows
+* Manual memory management leads to common pitfalls like memory leaks and dangling pointers
+* No built-in bounds checking makes string operations inherently risky
+* String manipulation requires careful attention to null termination
+* Concatenation and resizing operations are error-prone
+
+The c_string library addresses these challenges by providing a dynamic string type that:
+
+* Automatically manages memory allocation and resizing
+* Maintains string length and capacity information
+* Ensures null termination
+* Provides safe string manipulation functions
+* Prevents direct buffer access to avoid memory corruption
+
+When to Use This Library
+########################
+
+This library is particularly useful when:
+
+* Working with strings of unknown or varying length
+* Performing frequent string concatenation operations
+* Building strings incrementally
+* Requiring safe string manipulation in security-sensitive contexts
+* Managing multiple string operations with minimal memory overhead
+
+The library's encapsulated design prevents common string-related bugs while 
+maintaining the performance characteristics expected in C programs.
+
+This project enapsulates its funcitonality into the ``c_string.h`` header file, 
+which is wrapped in the header guard ``#ifdef __cplusplus`` which allows it to be 
+compiled with C++ as well as C
 
 .. toctree::
    :maxdepth: 2
@@ -21,12 +52,83 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Installation
+Contributing
 ============
-This package is loaded on the PyPi repository and can be installed via the following method
+Pull requests are welcome.  For major changes, please open an issue first to discuss
+what you would like to change.  Please make sure to include and update tests
+as well as relevant doc-string and sphinx updates.
 
-#. Create a python virtual environment ``python -m venv /path/to/new/virtual/environment``
-#. Activate the virtual environment with the following command;
+License
+=======
+The License is included in the **c_string** package
+
+Requirements
+============
+This library is developed and tested on Macintosh and Arch Linux Operating
+Systems.  It is developed with ``gcc 14.2.1`` and ``clang 16.0.6`` compilers. In
+addition, this code base requires the use of ``CMake 3.31.3``, ``cmocka``, and 
+``valgrind``.  This code is compiled and written with the C17 standard; however, this 
+should work with any compiler using C11 or later versions.
+
+Installation
+############
+In order to download this repository from `github <https://github.com/Jon-Webb-79/c_string>`_, follow these instructions
+
+#. Ensure you have ``.git`` installed on your computer
+
+#. Ensure you have ``cmake`` installed on your computer.  This code-base requires 
+   cmake version 3.31.3 or later versions.
+
+#. Download this repository to your preferred directory with the following command;
+
+   .. code-block:: bash 
+
+      git clone https://github.com/Jon-Webb-79/c_string.git c_string 
+
+#. Navigate to either the bash or zshell scripts directory depending on your 
+   environment with one of the following commands.
+
+   .. code-block:: bash 
+
+      cd c_string/scripts/bash 
+      cd c_string/scripts/zsh 
+
+#. When developing code, build the code base with the following command.
+
+   .. code-block:: bash 
+
+      # If using bash
+      bash debug.sh  
+      # If using zsh 
+      zsh debug.zsh
+
+#. Navigate to ``c_string/c_string/build/debug`` to run unit tests 
+
+   .. code-block:: bash 
+
+      valgrind ./unit_tests 
+      
+#. If all unit tests do not pass with no memory leaks, you may need to contact 
+   the administrator of this git repository.  If they do pass, then you are set 
+   to transform this code-base into a static or dynamic library, or just 
+   copy the ``.c`` and ``.h`` files to your project.
+
+Contribute to Code Base 
+-----------------------
+#. Establish a pull request with the git repository owner.
+
+#. Once the package has been downloade, you will also need to install
+   Python3.10 or later version to support documentation with Sphinx.
+
+#. Navigate to the ``c_string/docs/doxygen`` directory.
+
+#. Create a Python virtual environment with the following command.
+
+   .. code-block:: bash 
+
+      python -m venv .venv 
+
+#. Activate the virtual environment with the following command.
 
 .. table:: Activation Commands for Virtual Environments
 
@@ -46,29 +148,11 @@ This package is loaded on the PyPi repository and can be installed via the follo
    |                      | PowerShell       | ``PS C:\\> <venv>\\Scripts\\Activate.ps1``|
    +----------------------+------------------+-------------------------------------------+
 
-.. rst-class:: numbered-list
+#. Install packages to virtual environments from ``requirements.txt`` file
 
-#. Install poetry globally on your computer. Follow the instructions from the
-   `Poetry <https://python-poetry.org/docs/>`_ web site
-#. Set the poetry virtual environment with the following command ``poetry config virtualenvs.in-project true``
-#. Ensure you have .git installed on your computer.
-#. At your desired location create a directory titled  ``xx``
-#. Open a terminal (Bash, zsh or DOS) and cd to the ``xx`` directory
-#. Type ``git clone https://github.com/Jon-Webb-79/xx.git``
-#. Install packages with ``poetry install``
+   .. code-block:: bash 
 
+      pip install -r requirements.txt
 
-Usage
-=====
-The user instructions for this application is shown in :doc:`module`.
-
-
-Contributing
-============
-Pull requests are welcome.  For major changes, please open an issue first to discuss what
-you would like to change.  Please make sure to include and update tests as well
-as relevant cod-strings and sphinx updates.
-
-License
-=======
-This project uses a basic MIT license
+#. At this point you can build the files in the same way described in the 
+   previous section and contribute to documentation.

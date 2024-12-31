@@ -11,14 +11,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../../../src'))
+# import os
+# import sys
+# sys.path.insert(0, os.path.abspath('../../../src'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Project_Name'
-copyright = '2023, Jonathan A. Webb'
+project = 'C String'
+copyright = '2024, Jonathan A. Webb'
 author = 'Jonathan A. Webb'
 
 # The full version, including alpha/beta/rc tags
@@ -44,11 +44,11 @@ autodoc_default_flags = ["members", "show-inheritance"]
 autosummary_generate = True
 
 # Breathe Configuration
-breathe_default_project = "c_libs"
+breathe_default_project = "c_string"
 breathe_domain_by_extension = {"h" : "c", "c" : "c"}
 
 # This is the folder where Doxygen XML output goes, relative to conf.py
-breathe_projects = { "c_libs": "../doxygen_docs/xml/" }
+breathe_projects = { "c_string": "../doxygen_docs/xml/" }
 #autodoc_member_order = "groupwise"
 #autodoc_default_flags = ["members", "show-inheritance"]
 #autosummary_generate = True
