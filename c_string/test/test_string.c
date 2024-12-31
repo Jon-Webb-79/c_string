@@ -229,6 +229,90 @@ void test_concat_large_strings(void **state) {
     
     free_string(str1);
 }
+// --------------------------------------------------------------------------------
+
+/* Test cases for string comparison */
+void test_compare_strings_equal(void **state) {
+    string_t* str1 = init_string("hello");
+    string_t* str2 = init_string("hello");
+    
+    assert_int_equal(compare_strings(str1, str2), 0);
+    assert_int_equal(compare_strings(str1, "hello"), 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_compare_strings_less(void **state) {
+    string_t* str1 = init_string("hello");
+    string_t* str2 = init_string("world");
+    
+    assert_true(compare_strings(str1, str2) < 0);
+    assert_true(compare_strings(str1, "world") < 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
+// --------------------------------------------------------------------------------
+
+void test_compare_strings_greater(void **state) {
+    string_t* str1 = init_string("world");
+    string_t* str2 = init_string("hello");
+    
+    assert_true(compare_strings(str1, str2) > 0);
+    assert_true(compare_strings(str1, "hello") > 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
+// --------------------------------------------------------------------------------
+
+void test_compare_strings_different_lengths(void **state) {
+    string_t* str1 = init_string("hello");
+    string_t* str2 = init_string("hello world");
+    
+    assert_true(compare_strings(str1, str2) < 0);
+    assert_true(compare_strings(str1, "hello world") < 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
+// --------------------------------------------------------------------------------
+
+void test_compare_strings_empty(void **state) {
+    string_t* str1 = init_string("");
+    string_t* str2 = init_string("");
+    
+    assert_int_equal(compare_strings(str1, str2), 0);
+    assert_int_equal(compare_strings(str1, ""), 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_compare_strings_null(void **state) {
+    string_t* str = init_string("hello");
+    
+    assert_int_equal(compare_strings(NULL, str), INT_MIN);
+    assert_int_equal(compare_strings(str, NULL), INT_MIN);
+    assert_int_equal(errno, EINVAL);
+    
+    free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_compare_strings_case_sensitivity(void **state) {
+    string_t* str1 = init_string("Hello");
+    string_t* str2 = init_string("hello");
+    
+    assert_true(compare_strings(str1, str2) < 0);  // 'H' < 'h' in ASCII
+    assert_true(compare_strings(str1, "hello") < 0);
+    
+    free_string(str1);
+    free_string(str2);
+}
 // ================================================================================
 // ================================================================================
 // eof

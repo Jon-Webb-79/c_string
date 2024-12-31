@@ -44,6 +44,13 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_concat_multiple_times),
         cmocka_unit_test(test_concat_special_characters),
         cmocka_unit_test(test_concat_large_strings),
+        cmocka_unit_test(test_compare_strings_equal),
+        cmocka_unit_test(test_compare_strings_less),
+        cmocka_unit_test(test_compare_strings_greater),
+        cmocka_unit_test(test_compare_strings_different_lengths),
+        cmocka_unit_test(test_compare_strings_empty),
+        cmocka_unit_test(test_compare_strings_null),
+        cmocka_unit_test(test_compare_strings_case_sensitivity), 
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }
