@@ -510,3 +510,39 @@ reserve_string
      After reserve(20): 20
      Failed to reduce allocation as expected
      String content: Hello
+
+trim_string
+^^^^^^^^^^^
+.. c:function:: bool trim_string(string_t* str)
+
+  Reduces the allocated memory of a string_t object to the minimum required size
+  (string length plus null terminator). This is useful for optimizing memory usage
+  after string operations that might have left excess allocated space.
+
+  :param str: ``string_t`` object to trim
+  :returns: true if successful or already at minimum size, false on error
+  :raises: Sets errno to EINVAL if str is NULL or corrupted, ENOMEM if reallocation fails
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("Hello");
+     if (str) {
+         // First reserve extra space
+         reserve_string(str, 20);
+         printf("Before trim - Content: %s, Size: %zu, Allocated: %zu\n",
+                get_string(str), string_size(str), string_alloc(str));
+         
+         // Now trim the excess space
+         if (trim_string(str)) {
+             printf("After trim  - Content: %s, Size: %zu, Allocated: %zu\n",
+                    get_string(str), string_size(str), string_alloc(str));
+         }
+         free_string(str);
+     }
+
+  Output::
+
+     Before trim - Content: Hello, Size: 5, Allocated: 20
+     After trim  - Content: Hello, Size: 5, Allocated: 6
