@@ -218,6 +218,18 @@ string_t* copy_string(const string_t *str);
  * @return true of allocation is successful, false otherwise
  */
 bool reserve_string(string_t* str, size_t len);
+// -------------------------------------------------------------------------------- 
+
+/**
+ * @brief Tims the string memory to the minimum necessary size 
+ *
+ * THis function will determine the minimum memory allocation needed to fit 
+ * the string and will resize to the minimum memory if oversized.
+ *
+ * @param str A string container of type string_t
+ * @return true if operation is succesful, false otherwise with stderr printout
+ */
+bool trim_string(string_t* str);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

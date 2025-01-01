@@ -56,7 +56,10 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_copy_string_null),
         cmocka_unit_test(test_reserve_string_nominal),
         cmocka_unit_test(test_reserve_string_smaller_size),
-        cmocka_unit_test(test_reserve_string_null)
+        cmocka_unit_test(test_reserve_string_null),
+        cmocka_unit_test(test_trim_string_nominal),
+        cmocka_unit_test(test_trim_already_minimal),
+        cmocka_unit_test(test_trim_empty_string),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

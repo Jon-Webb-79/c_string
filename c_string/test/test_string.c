@@ -378,6 +378,56 @@ void test_reserve_string_null(void **state) {
    assert_false(reserve_string(NULL, 10));
    assert_int_equal(errno, EINVAL);
 }
+// -------------------------------------------------------------------------------- 
+
+void test_trim_string_nominal(void **state) {
+    string_t* str = init_string("test");
+    // First reserve extra space
+    assert_true(reserve_string(str, 20));
+    assert_int_equal(string_alloc(str), 20);
+    
+    // Now trim it
+    assert_true(trim_string(str));
+    assert_int_equal(string_size(str), 4);
+    assert_int_equal(string_alloc(str), 5);  // length + null terminator
+    assert_string_equal(get_string(str), "test");
+    
+    free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_trim_already_minimal(void **state) {
+    string_t* str = init_string("test");
+    // Should already be minimal (len + 1)
+    assert_true(trim_string(str));  // Should succeed but do nothing
+    assert_int_equal(string_size(str), 4);
+    assert_int_equal(string_alloc(str), 5);
+    assert_string_equal(get_string(str), "test");
+    
+    free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_trim_empty_string(void **state) {
+    string_t* str = init_string("");
+    // Reserve some space first
+    assert_true(reserve_string(str, 10));
+    assert_int_equal(string_alloc(str), 10);
+    
+    // Now trim it
+    assert_true(trim_string(str));
+    assert_int_equal(string_size(str), 0);
+    assert_int_equal(string_alloc(str), 1);  // Just null terminator
+    assert_string_equal(get_string(str), "");
+    
+    free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_trim_null_string(void **state) {
+    assert_false(trim_string(NULL));
+    assert_int_equal(errno, EINVAL);
+}
 // ================================================================================
 // ================================================================================
 // eof

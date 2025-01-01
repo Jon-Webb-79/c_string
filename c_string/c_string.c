@@ -250,6 +250,36 @@ bool reserve_string(string_t* str, size_t len) {
 
     return true;
 }
+// --------------------------------------------------------------------------------
+
+bool trim_string(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return false;
+    }
+    
+    // If already at minimum size, nothing to do
+    if (str->len + 1 == str->alloc) {
+        return true;
+    }
+    
+    // Sanity check for corrupted string_t
+    if (str->len + 1 > str->alloc) {
+        errno = EINVAL;
+        return false;
+    }
+
+    char *ptr = realloc(str->str, str->len + 1);
+    if (ptr == NULL) {
+        errno = ENOMEM;
+        fprintf(stderr, "ERROR: Failure to allocate memory for 'char*' in trim_string()\n");
+        return false;
+    }
+    
+    str->str = ptr;
+    str->alloc = str->len + 1;
+    return true;
+}
 // ================================================================================
 // ================================================================================
 // eof
