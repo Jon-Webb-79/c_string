@@ -1,7 +1,9 @@
 String Functions
 ================
 
-The c_string library provides a dynamic string type and associated functions for safe string manipulation in C.
+The c_string library provides a dynamic string type and associated functions 
+for safe string manipulation in C.  All of the functions described in this 
+section can be found in the ``c_string.h`` header file.
 
 Data Types
 ----------
@@ -33,10 +35,15 @@ init_string
 ^^^^^^^^^^^
 .. c:function:: string_t* init_string(const char* str)
 
-   Creates and initializes a new string_t object from a C-style string.
+   Creates and initializes a new ``string_t`` object from a C-style string. If
+   compiled with ``gcc`` of ``clang`` compilers, consider using :ref:`GBC_STRING
+   macro <string_cleanup_macro>`.  If the developer wishes to Pre-allocate 
+   a larger amount of memory than would be normally allocated with this function, 
+   they can also call the :ref:`reserve_string <reserve-string-func>` function 
+   after initialization.
 
    :param str: A null-terminated C string
-   :returns: Pointer to new string_t object, or NULL on failure
+   :returns: Pointer to new ``string_t`` object, or NULL on failure
    :raises: Sets errno to ENOMEM if memory allocation fails or EINVAL if str is NULL
 
    Example:
@@ -44,11 +51,16 @@ init_string
    .. code-block:: c
 
       string_t* str = init_string("Hello, World!");
+      /*
+       * if compiling with gcc or clang consider using 
+       * string_t* str STRING_GBC init_string("Hello, World!");
+       */
       if (str == NULL) {
           fprintf(stderr, "Failed to initialize string\n");
           return 1;
       }
       printf("String content: %s\n", get_string(str));
+      // If STRING_GBC macro is used, their is no need to call free_string()
       free_string(str);
 
    Output::
@@ -76,12 +88,15 @@ free_string
 Automatic Cleanup
 ~~~~~~~~~~~~~~~~~
 
+.. _string_cleanup_macro:
+
 STRING_GBC
 ^^^^^^^^^^
 .. c:macro:: STRING_GBC
 
-   Enables automatic cleanup of string_t objects when they go out of scope.
-   Available only with ``GCC`` and ``Clang`` compilers.
+   Enables automatic cleanup of ``string_t`` objects when they go out of scope.
+   Available only with ``GCC`` and ``Clang`` compilers.  If this option is available 
+   for your compiler, this is the preferred method for memory management.
 
    Example:
 
@@ -107,7 +122,7 @@ get_string
 ^^^^^^^^^^
 .. c:function:: const char* get_string(const string_t* str)
 
-  Retrieves the C string stored in a string_t object.
+  Retrieves the C string stored in a ``string_t`` object.
 
   :param str: Pointer to the string_t object
   :returns: Pointer to the null-terminated string, or NULL on failure
@@ -117,13 +132,14 @@ get_string
 
   .. code-block:: c
 
-     string_t* str = init_string("Hello, World!");
+     string_t* str STRING_GBC = init_string("Hello, World!");
+     // If not compiled with gcc or clang, string_t* str = init_string("Hello, World!");
      if (str) {
          const char* content = get_string(str);
          if (content) {
              printf("String content: %s\n", content);
          }
-         free_string(str);
+         // If not compiled with gcc or clang, free_string(str);
      }
 
   Output::
@@ -136,7 +152,7 @@ string_size
 
   Returns the length of the string (number of characters excluding null terminator).
 
-  :param str: Pointer to the string_t object
+  :param str: Pointer to the ``string_t`` object
   :returns: Length of string, or LONG_MAX on failure
   :raises: Sets errno to EINVAL if str is NULL
 
@@ -144,13 +160,14 @@ string_size
 
   .. code-block:: c
 
-     string_t* str = init_string("Hello");
+     string_t* str STRING_GBC = init_string("Hello");
+     // If not compiled with gcc or clang, string_t* str = init_string("Hello");
      if (str) {
          size_t len = string_size(str);
          if (len != LONG_MAX) {
              printf("String: %s\nLength: %zu\n", get_string(str), len);
          }
-         free_string(str);
+         // If not compiled with gcc or clang, free_string(str);
      }
 
   Output::
@@ -164,7 +181,7 @@ string_alloc
 
   Returns the total allocated capacity of the string buffer.
 
-  :param str: Pointer to the string_t object
+  :param str: Pointer to the ``string_t`` object
   :returns: Allocated capacity in bytes, or LONG_MAX on failure
   :raises: Sets errno to EINVAL if str is NULL
 
@@ -172,12 +189,13 @@ string_alloc
 
   .. code-block:: c
 
-     string_t* str = init_string("Test");
+     string_t* str STRING_GBC = init_string("Test");
+     // If not compiled with gcc or clang, string_t* str = init_string("Test");
      if (str) {
          printf("String: %s\n", get_string(str));
          printf("Length: %zu\n", string_size(str));
          printf("Allocated: %zu\n", string_alloc(str));
-         free_string(str);
+         // If not compiled with gcc or clang, free_string(str);
      }
 
   Output::
@@ -193,7 +211,9 @@ string_string_concat
 ^^^^^^^^^^^^^^^^^^^^
 .. c:function:: bool string_string_concat(string_t* str1, const string_t* str2)
 
-  Concatenates two string_t objects, appending the second string to the first.
+  Concatenates two ``string_t`` objects, appending the second string to the first.
+  Developers should consider using the :ref:`string_concat macro <string-concat-macro>`
+  in place of the ``string_string_concat`` function.
 
   :param str1: Destination string_t object
   :param str2: Source string_t object to append
@@ -224,7 +244,9 @@ string_lit_concat
 ^^^^^^^^^^^^^^^^^
 .. c:function:: bool string_lit_concat(string_t* str1, const char* literal)
 
-  Concatenates a C string literal to a string_t object.
+  Concatenates a C string literal to a ``string_t`` object.Developers should consider 
+  using the :ref:`string_concat macro <string-concat-macro>` in place of the 
+  ``string_lit_concat`` function. 
 
   :param str1: Destination string_t object
   :param literal: C string to append
@@ -248,6 +270,8 @@ string_lit_concat
 
      Before: Hello 
      After:  Hello World!
+
+.. _string-concat-macro:
 
 string_concat Macro
 ^^^^^^^^^^^^^^^^^^^
@@ -291,9 +315,11 @@ compare_strings_lit
 ^^^^^^^^^^^^^^^^^^^
 .. c:function:: int compare_strings_lit(const string_t* str_struct, const char* string)
 
-  Compares a string_t object with a C string literal lexicographically.
+  Compares a ``string_t`` object with a C string literal lexicographically.
+  Developers should consider using the :ref:`compare_strings macro <compare-strings-macro>`
+  in place of the ``compare_strings_lit`` function. 
 
-  :param str_struct: string_t object to compare
+  :param str_struct: ``string_t`` object to compare
   :param string: C string literal to compare against
   :returns: < 0 if str_struct is less than string, 
            0 if equal, 
@@ -326,10 +352,12 @@ compare_strings_string
 ^^^^^^^^^^^^^^^^^^^^^^
 .. c:function:: int compare_strings_string(const string_t* str_struct_one, string_t* str_struct_two)
 
-  Compares two string_t objects lexicographically.
+  Compares two ``string_t`` objects lexicographically. Developers should consider 
+  using the :ref:`compare-strings macro <compare-strings-macro>` in place of the 
+  ``compare_strings_string`` function. 
 
-  :param str_struct_one: First string_t object to compare
-  :param str_struct_two: Second string_t object to compare against
+  :param str_struct_one: First ``string_t`` object to compare
+  :param str_struct_two: Second ``string_t`` object to compare against
   :returns: < 0 if str_struct_one is less than str_struct_two, 
            0 if equal, 
            > 0 if str_struct_one is greater than str_struct_two,
@@ -361,6 +389,8 @@ compare_strings_string
 
      Comparing 'hello' with 'world': -15
      Comparing 'hello' with 'hello': 0
+
+.. _compare-strings-macro:
 
 compare_strings Macro
 ^^^^^^^^^^^^^^^^^^^^^
@@ -401,9 +431,9 @@ copy_string
 ^^^^^^^^^^^
 .. c:function:: string_t* copy_string(const string_t* str)
 
-  Creates a deep copy of a string_t object, preserving both content and allocation size.
+  Creates a deep copy of a ``string_t`` object, preserving both content and allocation size.
 
-  :param str: string_t object to copy
+  :param str: ``string_t`` object to copy
   :returns: New string_t object with identical content, or NULL on failure
   :raises: Sets errno to EINVAL if str is NULL or ENOMEM if allocation fails
 
@@ -437,14 +467,16 @@ copy_string
      Original allocation: 12
      Copy allocation: 12
 
+.. _reserve-string-func:
+
 reserve_string
 ^^^^^^^^^^^^^^
 .. c:function:: bool reserve_string(string_t* str, size_t len)
 
-  Pre-allocates memory for a string_t object to optimize for future concatenations.
+  Pre-allocates memory for a ``string_t`` object to optimize for future concatenations.
   Will not reduce allocation size below current size.
 
-  :param str: string_t object to reserve memory for
+  :param str: ``string_t`` object to reserve memory for
   :param len: Desired buffer length in bytes
   :returns: true if successful, false if len is less than current allocation or on error
   :raises: Sets errno to EINVAL if str is NULL or len is too small, ENOMEM if allocation fails

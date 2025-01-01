@@ -5,7 +5,9 @@
 
 Welcome to C String documentation!
 ==================================
-C's built-in string handling, based on null-terminated character arrays, while efficient for simple operations, presents several challenges in modern software development:
+C's built-in string handling, based on null-terminated character arrays, while 
+efficient for simple operations, presents several challenges in modern software 
+development:
 
 * Fixed buffer sizes require precise size calculations to prevent buffer overflows
 * Manual memory management leads to common pitfalls like memory leaks and dangling pointers
@@ -13,7 +15,8 @@ C's built-in string handling, based on null-terminated character arrays, while e
 * String manipulation requires careful attention to null termination
 * Concatenation and resizing operations are error-prone
 
-The c_string library addresses these challenges by providing a dynamic string type that:
+The c_string library addresses these challenges by providing a dynamic string 
+type that:
 
 * Automatically manages memory allocation and resizing
 * Maintains string length and capacity information
@@ -24,6 +27,7 @@ The c_string library addresses these challenges by providing a dynamic string ty
 When to Use This Library
 ########################
 
+All of the functions in this library can be accessed from the ``c_string.h`` file.
 This library is particularly useful when:
 
 * Working with strings of unknown or varying length
