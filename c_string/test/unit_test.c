@@ -69,6 +69,14 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_last_char_occurance_not_found),
         cmocka_unit_test(test_last_char_occurance_empty_string),
         cmocka_unit_test(test_last_char_occurance_null),
+        cmocka_unit_test(test_string_start_pointer_nominal),
+        cmocka_unit_test(test_string_start_pointer_empty),
+        cmocka_unit_test(test_string_start_pointer_null),
+        cmocka_unit_test(test_string_end_pointer_nominal),
+        cmocka_unit_test(test_string_end_pointer_single_char),
+        cmocka_unit_test(test_string_end_pointer_empty),
+        cmocka_unit_test(test_string_end_pointer_null),
+        cmocka_unit_test(test_pointer_arithmetic),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

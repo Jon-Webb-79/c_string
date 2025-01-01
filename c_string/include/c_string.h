@@ -256,6 +256,110 @@ char* first_char_occurance(string_t* str, char value);
  * @return A char pointer to character value or a NULL pointer.
  */
 char* last_char_occurance(string_t* str, char value);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function first_lit_substr_occurance
+* @brief Finds the first occurrence of a C string literal substring within a string_t object.
+*
+* @param str The string_t object to search within
+* @param sub_str The C string literal to search for
+* @return Pointer to the beginning of the first occurrence of sub_str, or NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* first_lit_substr_occurance(string_t* str, char* sub_str);
+// --------------------------------------------------------------------------------
+
+/**
+* @function first_string_substr_occurance
+* @brief Finds the first occurrence of a string_t substring within another string_t object.
+*
+* @param str_1 The string_t object to search within
+* @param str_2 The string_t substring to search for
+* @return Pointer to the beginning of the first occurrence of str_2, or NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* first_string_substr_occurance(string_t* str_1, string_t* str_2);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @macro first_substr_occurance
+* @brief A generic macro that selects the appropriate substring search function
+*        based on the type of the second argument.
+*
+* If the second argument is a char*, calls first_lit_substr_occurance.
+* If the second argument is a string_t*, calls first_string_substr_occurance.
+*
+* Example usage:
+*     first_substr_occurance(str, "substring")     // Uses literal version
+*     first_substr_occurance(str1, str2)          // Uses string_t version
+*/
+#define first_substr_occurance(str1, str2) _Generic((str2) \
+    char*: first_lit_substr_occurance \
+    string_t*: first_string_substr_occurance) (str1, str2)
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function last_lit_substr_occurance
+* @brief Finds the last occurrence of a C string literal substring within a string_t object.
+*
+* @param str The string_t object to search within
+* @param sub_str The C string literal to search for
+* @return Pointer to the beginning of the last occurrence of sub_str, or NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* last_lit_substr_occurance(string_t* str, char* sub_str);
+// --------------------------------------------------------------------------------
+
+/**
+* @function last_string_substr_occurance
+* @brief Finds the last occurrence of a string_t substring within another string_t object.
+*
+* @param str_1 The string_t object to search within
+* @param str_2 The string_t substring to search for
+* @return Pointer to the beginning of the last occurrence of str_2, or NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* last_string_substr_occurance(string_t* str_1, string_t* str_2);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @macro last_substr_occurance
+* @brief A generic macro that selects the appropriate substring search function
+*        based on the type of the second argument.
+*
+* If the second argument is a char*, calls last_lit_substr_occurance.
+* If the second argument is a string_t*, calls last_string_substr_occurance.
+*
+* Example usage:
+*     last_substr_occurance(str, "substring")      // Uses literal version
+*     last_substr_occurance(str1, str2)           // Uses string_t version
+*/
+#define last_substr_occurance(str1, str2) _Generic((str2) \
+    char*: last_lit_substr_occurance \
+    string_t*: last_string_substr_occurance) (str1, str2)
+// --------------------------------------------------------------------------------
+
+/**
+* @function string_start_pointer
+* @brief Returns a pointer to the beginning of a string
+*
+* @param str A string_t object
+* @return Pointer to the beginning of the string NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* string_start_pointer(string_t* str);
+// --------------------------------------------------------------------------------
+
+/**
+* @function string_start_pointer
+* @brief Returns a pointer to the end of a string
+*
+* @param str A string_t object
+* @return Pointer to the end of the string NULL if not found
+*         Sets errno to EINVAL if either input is NULL
+*/
+char* string_end_pointer(string_t* str);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

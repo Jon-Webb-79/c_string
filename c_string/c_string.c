@@ -319,6 +319,26 @@ char* last_char_occurance(string_t* str, char value) {
     
     return NULL;
 }
+// --------------------------------------------------------------------------------
+
+char* string_start_pointer(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char* begin = str->str;
+    return begin;
+}
+// --------------------------------------------------------------------------------
+
+char* string_end_pointer(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char* begin = str->str + str->len - 1;
+    return begin;
+}
 // ================================================================================
 // ================================================================================
 // eof

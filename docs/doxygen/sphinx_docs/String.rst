@@ -634,3 +634,67 @@ Output::
    First 'l' at position: 2
    Last 'l' at position: 9
    Number of characters between: 7
+
+string_start_pointer
+~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* string_start_pointer(string_t* str)
+
+  Returns a pointer to the beginning of the string stored in a ``string_t`` object.
+  Similar to begin() in C++ string class.
+
+  :param str: ``string_t`` object to get start pointer from
+  :returns: Pointer to the first character of the string, or NULL on error
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("Hello World");
+     if (str) {
+         char* start = string_start_pointer(str);
+         if (start) {
+             printf("First character: %c\n", *start);
+             printf("First two chars: %.2s\n", start);
+         }
+         free_string(str);
+     }
+
+  Output::
+
+     First character: H
+     First two chars: He
+
+string_end_pointer
+~~~~~~~~~~~~~~~~~~
+.. c:function:: char* string_end_pointer(string_t* str)
+
+  Returns a pointer to the last character of the string stored in a ``string_t`` object.
+  Note: This points to the last actual character, not the null terminator.
+
+  :param str: ``string_t`` object to get end pointer from
+  :returns: Pointer to the last character of the string, or NULL on error
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("Hello World");
+     if (str) {
+         char* start = string_start_pointer(str);
+         char* end = string_end_pointer(str);
+         
+         if (start && end) {
+             printf("First character: %c\n", *start);
+             printf("Last character: %c\n", *end);
+             printf("String length: %td\n", end - start + 1);
+         }
+         free_string(str);
+     }
+
+  Output::
+
+     First character: H
+     Last character: d
+     String length: 11

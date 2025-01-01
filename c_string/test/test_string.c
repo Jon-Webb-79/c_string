@@ -523,6 +523,91 @@ void test_last_char_occurance_null(void **state) {
     assert_null(result);
     assert_int_equal(errno, EINVAL);
 }
+// --------------------------------------------------------------------------------
+
+void test_string_start_pointer_nominal(void **state) {
+   string_t* str = init_string("hello world");
+   char* start = string_start_pointer(str);
+   
+   assert_non_null(start);
+   assert_ptr_equal(start, get_string(str));
+   assert_int_equal(*start, 'h');  // First character should be 'h'
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_string_start_pointer_empty(void **state) {
+   string_t* str = init_string("");
+   char* start = string_start_pointer(str);
+   
+   assert_non_null(start);
+   assert_ptr_equal(start, get_string(str));
+   assert_int_equal(*start, '\0');  // Empty string starts with null terminator
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_start_pointer_null(void **state) {
+   char* start = string_start_pointer(NULL);
+   assert_null(start);
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_end_pointer_nominal(void **state) {
+   string_t* str = init_string("hello world");
+   char* end = string_end_pointer(str);
+   
+   assert_non_null(end);
+   assert_int_equal(*end, 'd');  // Last character should be 'd'
+   assert_ptr_equal(end, get_string(str) + string_size(str) - 1);
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_string_end_pointer_single_char(void **state) {
+   string_t* str = init_string("x");
+   char* end = string_end_pointer(str);
+   
+   assert_non_null(end);
+   assert_int_equal(*end, 'x');
+   assert_ptr_equal(end, get_string(str));
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_end_pointer_empty(void **state) {
+   string_t* str = init_string("");
+   char* end = string_end_pointer(str);
+   
+   // For empty string, end pointer should still be valid but point to position -1
+   // from the null terminator
+   assert_non_null(end);
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_string_end_pointer_null(void **state) {
+   char* end = string_end_pointer(NULL);
+   assert_null(end);
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_pointer_arithmetic(void **state) {
+   string_t* str = init_string("hello");
+   char* start = string_start_pointer(str);
+   char* end = string_end_pointer(str);
+   
+   assert_int_equal(end - start, 4);  // "hello" is 5 chars, end points to 'o'
+   
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof
