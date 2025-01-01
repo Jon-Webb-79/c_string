@@ -119,7 +119,7 @@ String Access Functions
 -----------------------
 
 get_string
-^^^^^^^^^^
+~~~~~~~~~~
 .. c:function:: const char* get_string(const string_t* str)
 
   Retrieves the C string stored in a ``string_t`` object.
@@ -147,10 +147,13 @@ get_string
      String content: Hello, World!
 
 string_size
-^^^^^^^^^^^
+~~~~~~~~~~~
 .. c:function:: const size_t string_size(const string_t* str)
 
   Returns the length of the string (number of characters excluding null terminator).
+  This is the equivalant of the ``strlen`` function from the ``string.h`` header 
+  file; however, this function is safely bounded by the length of the string 
+  and is not prone to buffer overflow attacks.
 
   :param str: Pointer to the ``string_t`` object
   :returns: Length of string, or LONG_MAX on failure
@@ -176,10 +179,10 @@ string_size
      Length: 5
 
 string_alloc
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 .. c:function:: const size_t string_alloc(const string_t* str)
 
-  Returns the total allocated capacity of the string buffer.
+  Returns the total allocated capacity of the string buffer. 
 
   :param str: Pointer to the ``string_t`` object
   :returns: Allocated capacity in bytes, or LONG_MAX on failure
@@ -208,12 +211,13 @@ String Concatenation Functions
 ------------------------------
 
 string_string_concat
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 .. c:function:: bool string_string_concat(string_t* str1, const string_t* str2)
 
   Concatenates two ``string_t`` objects, appending the second string to the first.
   Developers should consider using the :ref:`string_concat macro <string-concat-macro>`
-  in place of the ``string_string_concat`` function.
+  in place of the ``string_string_concat`` function. This function is bounded by
+  the length of the second string and is not prone to buffer overflow attacks.
 
   :param str1: Destination string_t object
   :param str2: Source string_t object to append
@@ -241,7 +245,7 @@ string_string_concat
      After:  Hello World!
 
 string_lit_concat
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 .. c:function:: bool string_lit_concat(string_t* str1, const char* literal)
 
   Concatenates a C string literal to a ``string_t`` object.Developers should consider 
@@ -274,7 +278,7 @@ string_lit_concat
 .. _string-concat-macro:
 
 string_concat Macro
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 .. c:macro:: string_concat(str_one, str_two)
 
   A generic macro that automatically selects the appropriate concatenation function
@@ -312,12 +316,15 @@ String Comparison Functions
 ---------------------------
 
 compare_strings_lit
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 .. c:function:: int compare_strings_lit(const string_t* str_struct, const char* string)
 
   Compares a ``string_t`` object with a C string literal lexicographically.
   Developers should consider using the :ref:`compare_strings macro <compare-strings-macro>`
-  in place of the ``compare_strings_lit`` function. 
+  in place of the ``compare_strings_lit`` function. This is the equivalent of the 
+  ``strcmp`` function from the ``string.h`` header file.  However, this function 
+  is bounded by the size of the first string and is not subject to buffer overflow 
+  attacks.
 
   :param str_struct: ``string_t`` object to compare
   :param string: C string literal to compare against
@@ -349,12 +356,14 @@ compare_strings_lit
      Comparing 'hello' with 'apple': 7
 
 compare_strings_string
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 .. c:function:: int compare_strings_string(const string_t* str_struct_one, string_t* str_struct_two)
 
   Compares two ``string_t`` objects lexicographically. Developers should consider 
   using the :ref:`compare-strings macro <compare-strings-macro>` in place of the 
-  ``compare_strings_string`` function. 
+  ``compare_strings_string`` function. This is hte equivalent of the ``strcmp``
+  function from the ``string.h`` header file; however, it is bounded by the length 
+  of the strings and is not subject to buffer overflow attacks.
 
   :param str_struct_one: First ``string_t`` object to compare
   :param str_struct_two: Second ``string_t`` object to compare against
@@ -393,11 +402,13 @@ compare_strings_string
 .. _compare-strings-macro:
 
 compare_strings Macro
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 .. c:macro:: compare_strings(str_one, str_two)
 
   A generic macro that automatically selects the appropriate comparison function
-  based on the type of the second argument.
+  based on the type of the second argument.  This macro is the equivalent of the 
+  ``strcmp`` function from the ``string.h`` header file and is bounded by the size 
+  of the first string, and is not subject to buffer overflow attacks.
 
   Example:
 
@@ -428,7 +439,7 @@ String Utility Functions
 ------------------------
 
 copy_string
-^^^^^^^^^^^
+~~~~~~~~~~~
 .. c:function:: string_t* copy_string(const string_t* str)
 
   Creates a deep copy of a ``string_t`` object, preserving both content and allocation size.
@@ -470,7 +481,7 @@ copy_string
 .. _reserve-string-func:
 
 reserve_string
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 .. c:function:: bool reserve_string(string_t* str, size_t len)
 
   Pre-allocates memory for a ``string_t`` object to optimize for future concatenations.
@@ -512,10 +523,10 @@ reserve_string
      String content: Hello
 
 trim_string
-^^^^^^^^^^^
+~~~~~~~~~~~
 .. c:function:: bool trim_string(string_t* str)
 
-  Reduces the allocated memory of a string_t object to the minimum required size
+  Reduces the allocated memory of a ``string_t`` object to the minimum required size
   (string length plus null terminator). This is useful for optimizing memory usage
   after string operations that might have left excess allocated space.
 
@@ -546,3 +557,80 @@ trim_string
 
      Before trim - Content: Hello, Size: 5, Allocated: 20
      After trim  - Content: Hello, Size: 5, Allocated: 6
+
+first_char_occurance
+~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* first_char_occurance(string_t* str, char value)
+
+  Finds the first occurrence of a character in a ``string_t`` object.
+  Similar to ``strchr()`` from the C standard library.
+
+  :param str: string_t object to search in
+  :param value: Character to search for
+  :returns: Pointer to the first occurrence of the character, or NULL if not found
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("Hello World");
+     if (str) {
+         char* result = first_char_occurance(str, 'l');
+         if (result) {
+             printf("First 'l' found at position: %ld\n", result - get_string(str));
+             printf("Remaining string from 'l': %s\n", result);
+         }
+         
+         // Try finding a character that doesn't exist
+         if (!first_char_occurance(str, 'z')) {
+             printf("Character 'z' not found\n");
+         }
+         
+         free_string(str);
+     }
+
+  Output::
+
+     First 'l' found at position: 2
+     Remaining string from 'l': llo World
+     Character 'z' not found
+
+last_char_occurance
+~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* last_char_occurance(string_t* str, char value)
+
+  Finds the last occurrence of a character in a ``string_t`` object.
+  Similar to ``strrchr()`` from the C standard library.
+
+  :param str: string_t object to search in
+  :param value: Character to search for
+  :returns: Pointer to the last occurrence of the character, or NULL if not found
+  :raises: Sets errno to EINVAL if str is NULL
+
+Example:
+
+.. code-block:: c
+
+   string_t* str = init_string("Hello World");
+   if (str) {
+       char* first = first_char_occurance(str, 'l');
+       char* last = last_char_occurance(str, 'l');
+
+       // ptrdiff_t can be accessed from the stddef.h header file
+       if (first && last) {
+           ptrdiff_t first_pos = first - get_string(str);
+           ptrdiff_t last_pos = last - get_string(str);
+           printf("First 'l' at position: %td\n", first_pos);
+           printf("Last 'l' at position: %td\n", last_pos);
+           printf("Number of characters between: %td\n", last - first);
+       }
+       
+       free_string(str);
+   }
+
+Output::
+
+   First 'l' at position: 2
+   Last 'l' at position: 9
+   Number of characters between: 7

@@ -280,6 +280,45 @@ bool trim_string(string_t* str) {
     str->alloc = str->len + 1;
     return true;
 }
+// -------------------------------------------------------------------------------- 
+
+char* first_char_occurance(string_t* str, char value) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    char* current = str->str;
+    while (*current != '\0') {
+        if (*current == value) {
+            return current;
+        }
+        current++;
+    }
+    
+    return NULL;
+}
+// -------------------------------------------------------------------------------- 
+
+char* last_char_occurance(string_t* str, char value) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    // Start from last character (before null terminator)
+    char* current = str->str + str->len - 1;
+    
+    // Continue until we reach the beginning of the string
+    while (current >= str->str) {
+        if (*current == value) {
+            return current;
+        }
+        current--;
+    }
+    
+    return NULL;
+}
 // ================================================================================
 // ================================================================================
 // eof

@@ -230,6 +230,32 @@ bool reserve_string(string_t* str, size_t len);
  * @return true if operation is succesful, false otherwise with stderr printout
  */
 bool trim_string(string_t* str);
+// -------------------------------------------------------------------------------- 
+
+/**
+ * @brief Finds the first occurance of a char between two pointers
+ *
+ * This function deterimines the first appearance of a char value in 
+ * a string literal.
+ *
+ * @param str A pointer to the string_t data type
+ * @param value The char value being search for in the string_t data type
+ * @return A char pointer to character value or a NULL pointer.
+ */
+char* first_char_occurance(string_t* str, char value);
+// -------------------------------------------------------------------------------- 
+
+/**
+ * @brief Finds the last occurance of a char between two pointers
+ *
+ * This function deterimines the first appearance of a char value in 
+ * a string literal.
+ *
+ * @param str A pointer to the string_t data type
+ * @param value The char value being search for in the string_t data type
+ * @return A char pointer to character value or a NULL pointer.
+ */
+char* last_char_occurance(string_t* str, char value);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

@@ -60,6 +60,15 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_trim_string_nominal),
         cmocka_unit_test(test_trim_already_minimal),
         cmocka_unit_test(test_trim_empty_string),
+        cmocka_unit_test(test_first_char_occurance_nominal),
+        cmocka_unit_test(test_first_char_occurance_not_found),
+        cmocka_unit_test(test_first_char_occurance_empty_string),
+        cmocka_unit_test(test_first_char_occurance_null),
+        cmocka_unit_test(test_last_char_occurance_nominal),
+        cmocka_unit_test(test_last_char_occurance_first_char),
+        cmocka_unit_test(test_last_char_occurance_not_found),
+        cmocka_unit_test(test_last_char_occurance_empty_string),
+        cmocka_unit_test(test_last_char_occurance_null),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }
