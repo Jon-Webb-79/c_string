@@ -27,9 +27,13 @@ format
 
 Core Functions
 --------------
+The functions and Macros in this section are core to the creation and 
+desctruction of ``size_t`` data types.
 
 Initialization and Memory Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions and Macros in this section are used to control the creation,
+memory allocation, and specific destruction of ``size_t`` data types.
 
 init_string
 ^^^^^^^^^^^
@@ -67,6 +71,84 @@ init_string
 
       String content: Hello, World!
 
+.. _reserve-string-func:
+
+reserve_string
+^^^^^^^^^^^^^^
+.. c:function:: bool reserve_string(string_t* str, size_t len)
+
+  Pre-allocates memory for a ``string_t`` object to optimize for future concatenations.
+  Will not reduce allocation size below current size.
+
+  :param str: ``string_t`` object to reserve memory for
+  :param len: Desired buffer length in bytes
+  :returns: true if successful, false if len is less than current allocation or on error
+  :raises: Sets errno to EINVAL if str is NULL or len is too small, ENOMEM if allocation fails
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("Hello");
+     if (str) {
+         printf("Initial allocation: %zu\n", string_alloc(str));
+         
+         // Reserve more space
+         if (reserve_string(str, 20)) {
+             printf("After reserve(20): %zu\n", string_alloc(str));
+             
+             // Try to reserve less space (should fail)
+             if (!reserve_string(str, 10)) {
+                 printf("Failed to reduce allocation as expected\n");
+             }
+             
+             // Content remains unchanged
+             printf("String content: %s\n", get_string(str));
+         }
+     }
+
+  Output::
+
+     Initial allocation: 6
+     After reserve(20): 20
+     Failed to reduce allocation as expected
+     String content: Hello
+
+trim_string
+^^^^^^^^^^^
+.. c:function:: bool trim_string(string_t* str)
+
+  Reduces the allocated memory of a ``string_t`` object to the minimum required size
+  (string length plus null terminator). This is useful for optimizing memory usage
+  after string operations that might have left excess allocated space.
+
+  :param str: ``string_t`` object to trim
+  :returns: true if successful or already at minimum size, false on error
+  :raises: Sets errno to EINVAL if str is NULL or corrupted, ENOMEM if reallocation fails
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("Hello");
+     if (str) {
+         // First reserve extra space
+         reserve_string(str, 20);
+         printf("Before trim - Content: %s, Size: %zu, Allocated: %zu\n",
+                get_string(str), string_size(str), string_alloc(str));
+         
+         // Now trim the excess space
+         if (trim_string(str)) {
+             printf("After trim  - Content: %s, Size: %zu, Allocated: %zu\n",
+                    get_string(str), string_size(str), string_alloc(str));
+         }
+     }
+
+  Output::
+
+     Before trim - Content: Hello, Size: 5, Allocated: 20
+     After trim  - Content: Hello, Size: 5, Allocated: 6
+
 free_string
 ^^^^^^^^^^^
 .. c:function:: void free_string(string_t* str)
@@ -87,6 +169,10 @@ free_string
 
 Automatic Cleanup
 ~~~~~~~~~~~~~~~~~
+In general the C language does not allow automated garbage collection of 
+memory that is out of scope.  This section describes a poor mans 
+garbage collection within the C language, for the ``string_t`` data type,
+that can only be enabled if compiled with ``gcc`` or ``clang``.
 
 .. _string_cleanup_macro:
 
@@ -117,6 +203,8 @@ STRING_GBC
 
 String Access Functions
 -----------------------
+The functions discussed in this section are used to access the string within 
+the ``string_t`` data type as well as the allocated memory and size of a string.
 
 get_string
 ~~~~~~~~~~
@@ -207,11 +295,20 @@ string_alloc
      Length: 4
      Allocated: 5
 
-String Concatenation Functions
-------------------------------
+String Manipulation Functions
+-----------------------------
+The functions and Macros within this section allow a user to manipulate the 
+string data within the ``string_t`` data type.
+
+Concatenation Functions and Macros 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These functions and macros allow a user to concatenate data to a ``string_t``
+data type with a string literal or another ``string_t`` data type.  These 
+functions are essentially the equivalent of a ``push_back`` function for the 
+``string_t`` data type.
 
 string_string_concat
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^
 .. c:function:: bool string_string_concat(string_t* str1, const string_t* str2)
 
   Concatenates two ``string_t`` objects, appending the second string to the first.
@@ -228,15 +325,13 @@ string_string_concat
 
   .. code-block:: c
 
-     string_t* str1 = init_string("Hello ");
-     string_t* str2 = init_string("World!");
+     string_t* str1 STRING_GBC = init_string("Hello ");
+     string_t* str2 STRING_GBC = init_string("World!");
      if (str1 && str2) {
          printf("Before: %s\n", get_string(str1));
          if (string_string_concat(str1, str2)) {
              printf("After:  %s\n", get_string(str1));
          }
-         free_string(str1);
-         free_string(str2);
      }
 
   Output::
@@ -245,7 +340,7 @@ string_string_concat
      After:  Hello World!
 
 string_lit_concat
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 .. c:function:: bool string_lit_concat(string_t* str1, const char* literal)
 
   Concatenates a C string literal to a ``string_t`` object.Developers should consider 
@@ -261,13 +356,12 @@ string_lit_concat
 
   .. code-block:: c
 
-     string_t* str = init_string("Hello ");
+     string_t* str STRING_GBC = init_string("Hello ");
      if (str) {
          printf("Before: %s\n", get_string(str));
          if (string_lit_concat(str, "World!")) {
              printf("After:  %s\n", get_string(str));
          }
-         free_string(str);
      }
 
   Output::
@@ -278,7 +372,7 @@ string_lit_concat
 .. _string-concat-macro:
 
 string_concat Macro
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 .. c:macro:: string_concat(str_one, str_two)
 
   A generic macro that automatically selects the appropriate concatenation function
@@ -288,8 +382,8 @@ string_concat Macro
 
   .. code-block:: c
 
-     string_t* str1 = init_string("Hello ");
-     string_t* str2 = init_string("World ");
+     string_t* str1 STRING_GBC = init_string("Hello ");
+     string_t* str2 STRING_GBC = init_string("World ");
      
      if (str1 && str2) {
          printf("Initial: %s\n", get_string(str1));
@@ -301,9 +395,6 @@ string_concat Macro
          // Using macro with literal
          string_concat(str1, "!!!");
          printf("After literal concat: %s\n", get_string(str1));
-         
-         free_string(str1);
-         free_string(str2);
      }
 
   Output::
@@ -312,8 +403,128 @@ string_concat Macro
      After string_t concat: Hello World 
      After literal concat: Hello World !!!
 
+Drop Substring Functions and Macros 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions and Macros in this section are used to search the char data 
+within a ``string_t`` data type for a sub-string.  If the sub-string is found 
+it is removed from the string and the data is shifted an appropriate amount 
+to form a contiguous char array within the ``string_t`` data type.
+
+.. _drop-lit-substr-func:
+
+drop_lit_substr
+^^^^^^^^^^^^^^^
+.. c:function:: bool drop_lit_substr(string_t* string, char* substring, char* min_ptr, char* max_ptr)
+
+  Removes all occurrences of a C string literal substring between two pointers in a ``string_t`` object.
+  Searches from end to beginning and preserves existing spaces between words. 
+  The :ref:`drop_substr <drop-substr-macro>` generic Macro can also be used in place of this function. 
+
+  :param string: ``string_t`` object to modify
+  :param substring: C string literal to remove
+  :param min_ptr: Pointer to start of search range
+  :param max_ptr: Pointer to end of search range
+  :returns: true if successful (including no matches found), false on error
+  :raises: Sets errno to EINVAL if inputs are NULL or range invalid, ERANGE if pointers out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello world hello there hello");
+     char* start = first_char(str);
+     char* end = last_char(str);
+     
+     if (drop_lit_substr(str, "hello", start, end)) {
+         printf("Result: '%s'\n", get_string(str));
+     }
+
+  Output::
+
+     Result: 'world there '
+
+.. _drop-string-substr-func:
+
+drop_string_substr
+^^^^^^^^^^^^^^^^^^
+.. c:function:: bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr, char* max_ptr)
+
+  Removes all occurrences of a ``string_t`` substring between two pointers in another string_t object.
+  Searches from end to beginning and preserves existing spaces between words.
+  The :ref:`drop_substr <drop-substr-macro>` generic Macro can also be used in 
+  place of this function.
+
+  :param string: string_t object to modify
+  :param substring: string_t object containing substring to remove
+  :param min_ptr: Pointer to start of search range
+  :param max_ptr: Pointer to end of search range
+  :returns: true if successful (including no matches found), false on error
+  :raises: Sets errno to EINVAL if inputs are NULL or range invalid, ERANGE if pointers out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello world hello there hello");
+     string_t* sub STRING_GBC = init_string("hello");
+     char* start = first_char(str);
+     char* end = last_char(str);
+     
+     if (drop_string_substr(str, sub, start, end)) {
+         printf("Result: '%s'\n", get_string(str));
+     }
+
+  Output::
+
+     Result: 'world there '
+
+.. _drop-substr-macro:
+
+drop_substr
+^^^^^^^^^^^
+.. c:macro:: drop_substr(string, substr, min_ptr, max_ptr)
+
+  A generic macro that selects the appropriate substring removal function based on
+  the type of the second argument. Provides a unified interface for removing substrings
+  regardless of the substring type.  This macro is a wrapper around the 
+  :ref:`drop_lit_substr() <drop-lit-substr-func>` and 
+  :ref:`drop_string_substr() <drop-string-substr-func>` functions.
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("test hello test hello test");
+     string_t* sub STRING_GBC = init_string("hello");
+     char* start = first_char(str);
+     char* end = last_char(str);
+     
+     // Using with literal
+     printf("Using literal - Before: '%s'\n", get_string(str));
+     drop_substr(str, "hello", start, end);
+     printf("After: '%s'\n", get_string(str));
+     
+     // Reset string
+     free_string(str);
+     str STRING_GBC = init_string("test hello test hello test");
+     
+     // Using with string_t
+     printf("\nUsing string_t - Before: '%s'\n", get_string(str));
+     drop_substr(str, sub, start, end);
+     printf("After: '%s'\n", get_string(str));
+
+  Output::
+
+     Using literal - Before: 'test hello test hello test'
+     After: 'test test test'
+     
+     Using string_t - Before: 'test hello test hello test'
+     After: 'test test test'
+
 String Comparison Functions
 ---------------------------
+The functions and Macros in this section are used to compare to strings 
+for equivalance or for their differences.
 
 compare_strings_lit
 ~~~~~~~~~~~~~~~~~~~
@@ -437,6 +648,8 @@ compare_strings Macro
 
 String Utility Functions
 ------------------------
+The functions and Macros in this section offer general utility functions 
+for characterizing data within the ``size_t`` data type.
 
 copy_string
 ~~~~~~~~~~~
@@ -477,86 +690,6 @@ copy_string
      Copy size: 11
      Original allocation: 12
      Copy allocation: 12
-
-.. _reserve-string-func:
-
-reserve_string
-~~~~~~~~~~~~~~
-.. c:function:: bool reserve_string(string_t* str, size_t len)
-
-  Pre-allocates memory for a ``string_t`` object to optimize for future concatenations.
-  Will not reduce allocation size below current size.
-
-  :param str: ``string_t`` object to reserve memory for
-  :param len: Desired buffer length in bytes
-  :returns: true if successful, false if len is less than current allocation or on error
-  :raises: Sets errno to EINVAL if str is NULL or len is too small, ENOMEM if allocation fails
-
-  Example:
-
-  .. code-block:: c
-
-     string_t* str = init_string("Hello");
-     if (str) {
-         printf("Initial allocation: %zu\n", string_alloc(str));
-         
-         // Reserve more space
-         if (reserve_string(str, 20)) {
-             printf("After reserve(20): %zu\n", string_alloc(str));
-             
-             // Try to reserve less space (should fail)
-             if (!reserve_string(str, 10)) {
-                 printf("Failed to reduce allocation as expected\n");
-             }
-             
-             // Content remains unchanged
-             printf("String content: %s\n", get_string(str));
-         }
-         free_string(str);
-     }
-
-  Output::
-
-     Initial allocation: 6
-     After reserve(20): 20
-     Failed to reduce allocation as expected
-     String content: Hello
-
-trim_string
-~~~~~~~~~~~
-.. c:function:: bool trim_string(string_t* str)
-
-  Reduces the allocated memory of a ``string_t`` object to the minimum required size
-  (string length plus null terminator). This is useful for optimizing memory usage
-  after string operations that might have left excess allocated space.
-
-  :param str: ``string_t`` object to trim
-  :returns: true if successful or already at minimum size, false on error
-  :raises: Sets errno to EINVAL if str is NULL or corrupted, ENOMEM if reallocation fails
-
-  Example:
-
-  .. code-block:: c
-
-     string_t* str = init_string("Hello");
-     if (str) {
-         // First reserve extra space
-         reserve_string(str, 20);
-         printf("Before trim - Content: %s, Size: %zu, Allocated: %zu\n",
-                get_string(str), string_size(str), string_alloc(str));
-         
-         // Now trim the excess space
-         if (trim_string(str)) {
-             printf("After trim  - Content: %s, Size: %zu, Allocated: %zu\n",
-                    get_string(str), string_size(str), string_alloc(str));
-         }
-         free_string(str);
-     }
-
-  Output::
-
-     Before trim - Content: Hello, Size: 5, Allocated: 20
-     After trim  - Content: Hello, Size: 5, Allocated: 6
 
 first_char_occurance
 ~~~~~~~~~~~~~~~~~~~~
@@ -699,8 +832,14 @@ last_char
 
 .. _first-lit-substr-func:
 
+First Occurance of a Substring 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions and Macros in this section offer a utility to search for the 
+first occurrence of a sub-string within a ``string_t`` data type.  These functions 
+and Macros return the location of the sub-string start point as a ``char`` pointer.
+
 first_lit_substr_occurance
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. c:function:: char* first_lit_substr_occurance(string_t* str, char* sub_str)
 
   Finds the first occurrence of a C string literal substring within a ``string_t`` object.
@@ -734,7 +873,7 @@ first_lit_substr_occurance
 .. _first-str-substr-func:
 
 first_string_substr_occurrence
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. c:function:: char* first_string_substr_occurrence(string_t* str, string_t* sub_str)
 
   Finds the first occurrence of a ``string_t`` substring within another ``string_t`` object.
@@ -768,7 +907,7 @@ first_string_substr_occurrence
 .. _first-substr-macro:
 
 first_substr_occurrence
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 .. c:macro:: first_substr_occurance(str1, str2)
 
   A generic macro that selects the appropriate substring search function based on
@@ -804,10 +943,16 @@ first_substr_occurrence
      Found 'hello' at position: 0
      Found 'world' at position: 6
 
+Last Occurance of a Substring 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions and Macros in this section offer a utility to search for the 
+last occurrence of a sub-string within a ``string_t`` data type.  These functions 
+and Macros return the location of the sub-string start point as a ``char`` pointer.
+
 .. _last-lit-substr-func:
 
 last_lit_substr_occurrence
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. c:function:: char* last_lit_substr_occurrence(string_t* str, char* sub_str)
 
   Finds the last occurrence of a C string literal substring within a ``string_t`` object.
@@ -841,7 +986,7 @@ last_lit_substr_occurrence
 .. _last-string-substr-func:
 
 last_string_substr_occurrence
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. c:function:: char* last_string_substr_occurrence(string_t* str, string_t* sub_str)
 
   Finds the last occurrence of a ``string_t`` substring within another ``string_t`` object.
@@ -877,7 +1022,7 @@ last_string_substr_occurrence
 .. _last-substr-macro:
 
 last_substr_occurrence
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 .. c:macro:: last_substr_occurrence(str1, str2)
 
   A generic macro that selects the appropriate substring search function based on
@@ -912,3 +1057,47 @@ last_substr_occurrence
 
      Last 'hello' using literal at: 18
      Last 'hello' using string_t at: 18
+
+is_string_ptr
+~~~~~~~~~~~~~
+.. c:function:: bool is_string_ptr(string_t* str, char* ptr)
+
+  Determines if a pointer falls within the valid bounds of a ``string_t`` object's string data.
+  This is useful for validating pointers returned by string search functions or pointer
+  arithmetic operations.
+
+  :param str: ``string_t`` object containing the string data
+  :param ptr: Pointer to check
+  :returns: true if pointer is within string bounds, false otherwise
+  :raises: Sets errno to EINVAL if either input is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello world");
+     // Get a pointer to the middle of the string
+     char* middle = first_char(str) + 5;  // Points to space
+     
+     if (is_string_ptr(str, middle)) {
+         printf("Pointer is within string bounds\n");
+         printf("Character at pointer: '%c'\n", *middle);
+     }
+     
+     // Check a pointer outside bounds
+     char* beyond = first_char(str) + string_size(str);  // Points to null terminator
+     if (!is_string_ptr(str, beyond)) {
+         printf("Pointer is outside string bounds\n");
+     }
+     
+
+  Output::
+
+     Pointer is within string bounds
+     Character at pointer: ' '
+     Pointer is outside string bounds
+
+  Note:
+     The valid range includes all characters from the first character up to, but not
+     including, the null terminator. A pointer equal to str->str + str->len (pointing
+     to the null terminator) is considered out of bounds.

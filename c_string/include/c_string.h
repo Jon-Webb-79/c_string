@@ -362,7 +362,30 @@ char* first_char(string_t* str);
 char* last_char(string_t* str);
 // --------------------------------------------------------------------------------
 
+/**
+* @function is_string_ptr
+* @brief Deterimes if a pointer is within the bounds of a function
+*
+* @param str A string_t object
+* @param ptr A char pointer 
+* @return true if the pointer is within the string bounds, 
+*         false otherwise.  If str, str->str, or ptr are NULL,
+*         the function will return false and set errno to EINVAL
+*/
+bool is_string_ptr(string_t* str, char* ptr);
+// --------------------------------------------------------------------------------
 
+bool drop_lit_substr(string_t* string, char* substring, char* min_ptr,
+                     char* max_ptr);
+// -------------------------------------------------------------------------------- 
+
+bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr,
+                        char* max_ptr);
+// -------------------------------------------------------------------------------- 
+
+#define drop_substr(string, substr, min_ptr, max_ptr) _Generic((substr), \
+    char*: drop_lit_substr, \
+    string_t*: drop_string_substr) (string, substr, min_ptr, max_ptr)
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

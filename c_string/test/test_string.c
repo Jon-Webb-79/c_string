@@ -843,6 +843,168 @@ void test_last_substr_string_too_long(void **state) {
    free_string(str);
    free_string(sub);
 }
+// --------------------------------------------------------------------------------
+
+void test_is_string_ptr_within_bounds(void **state) {
+   string_t* str = init_string("hello world");
+   
+   // Check middle of string
+   char* mid = first_char(str) + 5;  // Points to space
+   assert_true(is_string_ptr(str, mid));
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_is_string_ptr_at_boundaries(void **state) {
+   string_t* str = init_string("hello");
+   
+   // Check first character
+   char* start = first_char(str);
+   assert_true(is_string_ptr(str, start));
+   
+   // Check last character
+   char* last = first_char(str) + string_size(str) - 1;
+   assert_true(is_string_ptr(str, last));
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_is_string_ptr_outside_bounds(void **state) {
+   string_t* str = init_string("hello");
+   
+   // Check one past the end (at null terminator)
+   char* past_end = first_char(str) + string_size(str);
+   assert_false(is_string_ptr(str, past_end));
+   
+   // Check before start (undefined behavior in practice, but good for testing)
+   char* before_start = first_char(str) - 1;
+   assert_false(is_string_ptr(str, before_start));
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_is_string_ptr_empty_string(void **state) {
+   string_t* str = init_string("");
+   char* ptr = first_char(str);
+   
+   // Even with empty string, the pointer to the start should be valid
+   assert_false(is_string_ptr(str, ptr));  // False because len is 0
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_is_string_ptr_null_inputs(void **state) {
+   string_t* str = init_string("test");
+   
+   // Test NULL string_t
+   assert_false(is_string_ptr(NULL, first_char(str)));
+   assert_int_equal(errno, EINVAL);
+   
+   // Test NULL pointer
+   assert_false(is_string_ptr(str, NULL));
+   assert_int_equal(errno, EINVAL);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_literal_nominal(void **state) {
+   string_t* str = init_string("hello world hello there hello");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, "hello", start, end));
+   assert_string_equal(get_string(str), "world there ");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_literal_with_spaces(void **state) {
+   string_t* str = init_string("test hello test hello test");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, "hello", start, end));
+   assert_string_equal(get_string(str), "test test test");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_literal_partial_range(void **state) {
+   string_t* str = init_string("hello world hello there hello");
+   char* start = first_char(str) + 6;  // Start at "world"
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, "hello", start, end));
+   assert_string_equal(get_string(str), "hello world there ");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_string_nominal(void **state) {
+   string_t* str = init_string("hello world hello there hello");
+   string_t* sub = init_string("hello");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, sub, start, end));
+   assert_string_equal(get_string(str), "world there ");
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_string_with_spaces(void **state) {
+   string_t* str = init_string("test hello test hello test");
+   string_t* sub = init_string("hello");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, sub, start, end));
+   assert_string_equal(get_string(str), "test test test");
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_not_found(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* sub = init_string("xyz");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   assert_true(drop_substr(str, sub, start, end));
+   assert_string_equal(get_string(str), "hello world");  // Should remain unchanged
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_drop_substring_invalid_range(void **state) {
+   string_t* str = init_string("hello world");
+   char* start = first_char(str);
+   char* end = last_char(str);
+   
+   // Test with end before start
+   assert_false(drop_substr(str, "hello", end, start));
+   assert_int_equal(errno, EINVAL);
+   
+   // Test with out of bounds pointers
+   assert_false(drop_substr(str, "hello", start - 1, end));
+   assert_int_equal(errno, ERANGE);
+   
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof

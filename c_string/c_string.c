@@ -27,6 +27,40 @@ struct string_t {
     size_t len;
     size_t alloc;
 };
+// ================================================================================ 
+// ================================================================================ 
+// PRIVATE FUNCTIONS
+
+static char* _last_literal_between_ptrs(char* string, char* min_ptr, char* max_ptr) {
+    if (!string) {
+        fprintf(stderr, "ERROR: Null string provided for last_literal_between_ptrs\n");
+        return NULL;
+    }
+    if (min_ptr >= max_ptr) {
+        fprintf(stderr, "ERROR: Min pointer larger than max pointer in last_literal_between_ptrs\n");
+        return NULL;
+    }
+    
+    size_t str_len = strlen(string);
+    if (str_len == 0) return NULL;
+    
+    // Ensure we don't search past the end
+    char* search_start = max_ptr - str_len + 1;
+    if (search_start < min_ptr) return NULL;
+    
+    for (char* it = search_start; it >= min_ptr; it--) {
+        size_t j;
+        for (j = 0; j < str_len; j++) {
+            if (string[j] != *(it + j)) {
+                break;
+            }
+        }
+        if (j == str_len) return it;
+    }
+    return NULL;
+}
+// ================================================================================ 
+// ================================================================================ 
 // --------------------------------------------------------------------------------
 
 string_t* init_string(const char* str) {
@@ -470,6 +504,93 @@ char* last_char(string_t* str) {
     }
     char* begin = str->str + str->len - 1;
     return begin;
+}
+// --------------------------------------------------------------------------------
+
+bool is_string_ptr(string_t* str, char* ptr) {
+    if (!str || !str->str || !ptr) {
+        errno = EINVAL;
+        return false;  // Changed from NULL to false
+    }
+    
+    char* start = first_char(str);
+    char* end = start + str->len;  // Points one past the last character
+    
+    return (ptr >= start && ptr < end);
+}
+// -------------------------------------------------------------------------------- 
+
+bool drop_lit_substr(string_t* string, char* substring, char* min_ptr, char* max_ptr) {
+    if (!string || !substring || !string->str) {
+        errno = EINVAL;
+        return false;
+    }
+    if (!is_string_ptr(string, min_ptr) || !is_string_ptr(string, max_ptr)) {
+        errno = ERANGE;
+        return false;
+    }
+    if (max_ptr <= min_ptr) {
+        errno = EINVAL;
+        return false;
+    }
+    
+    size_t substr_len = strlen(substring);
+    if (string->len < substr_len) return true;
+    
+    char* ptr;
+    while ((ptr = _last_literal_between_ptrs(substring, min_ptr, max_ptr))) {
+        size_t drop_len = substr_len;
+        // Check if there's a space after the substring and it's within bounds
+        if (ptr + substr_len < string->str + string->len && 
+            *(ptr + substr_len) == ' ') {
+            drop_len++;  // Include the space
+        }
+        
+        size_t move_length = max_ptr - (ptr + drop_len) + 1;
+        memmove(ptr, ptr + drop_len, move_length);
+        
+        string->len -= drop_len;
+        max_ptr -= drop_len;
+        *(string->str + string->len) = '\0';
+    }
+    return true;
+}
+// --------------------------------------------------------------------------------
+
+bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr, char* max_ptr) {
+    if (!string || !substring || !string->str || !substring->str) {
+        errno = EINVAL;
+        return false;
+    }
+    if (!is_string_ptr(string, min_ptr) || !is_string_ptr(string, max_ptr)) {
+        errno = ERANGE;
+        return false;
+    }
+    if (max_ptr <= min_ptr) {
+        errno = EINVAL;
+        return false;
+    }
+    
+    size_t substr_len = substring->len;
+    if (string->len < substr_len) return true;
+    
+    char* ptr;
+    while ((ptr = _last_literal_between_ptrs(substring->str, min_ptr, max_ptr))) {
+        size_t drop_len = substr_len;
+        // Check if there's a space after the substring and it's within bounds
+        if (ptr + substr_len < string->str + string->len && 
+            *(ptr + substr_len) == ' ') {
+            drop_len++;  // Include the space
+        }
+        
+        size_t move_length = max_ptr - (ptr + drop_len) + 1;
+        memmove(ptr, ptr + drop_len, move_length);
+        
+        string->len -= drop_len;
+        max_ptr -= drop_len;
+        *(string->str + string->len) = '\0';
+    }
+    return true;
 }
 // ================================================================================
 // ================================================================================

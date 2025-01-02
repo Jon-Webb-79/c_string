@@ -96,6 +96,18 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_last_substr_string_not_found),
         cmocka_unit_test(test_last_substr_string_empty),
         cmocka_unit_test(test_last_substr_string_too_long),
+        cmocka_unit_test(test_is_string_ptr_within_bounds),
+        cmocka_unit_test(test_is_string_ptr_at_boundaries),
+        cmocka_unit_test(test_is_string_ptr_outside_bounds),
+        cmocka_unit_test(test_is_string_ptr_empty_string),
+        cmocka_unit_test(test_is_string_ptr_null_inputs),
+        cmocka_unit_test(test_drop_substring_literal_nominal),
+        cmocka_unit_test(test_drop_substring_literal_with_spaces),
+        cmocka_unit_test(test_drop_substring_literal_partial_range),
+        cmocka_unit_test(test_drop_substring_string_nominal),
+        cmocka_unit_test(test_drop_substring_string_with_spaces),
+        cmocka_unit_test(test_drop_substring_not_found),
+        cmocka_unit_test(test_drop_substring_invalid_range),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }
