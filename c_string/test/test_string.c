@@ -527,7 +527,7 @@ void test_last_char_occurance_null(void **state) {
 
 void test_string_start_pointer_nominal(void **state) {
    string_t* str = init_string("hello world");
-   char* start = string_start_pointer(str);
+   char* start = first_char(str);
    
    assert_non_null(start);
    assert_ptr_equal(start, get_string(str));
@@ -539,7 +539,7 @@ void test_string_start_pointer_nominal(void **state) {
 
 void test_string_start_pointer_empty(void **state) {
    string_t* str = init_string("");
-   char* start = string_start_pointer(str);
+   char* start = first_char(str);
    
    assert_non_null(start);
    assert_ptr_equal(start, get_string(str));
@@ -550,7 +550,7 @@ void test_string_start_pointer_empty(void **state) {
 // --------------------------------------------------------------------------------
 
 void test_string_start_pointer_null(void **state) {
-   char* start = string_start_pointer(NULL);
+   char* start = first_char(NULL);
    assert_null(start);
    assert_int_equal(errno, EINVAL);
 }
@@ -558,7 +558,7 @@ void test_string_start_pointer_null(void **state) {
 
 void test_string_end_pointer_nominal(void **state) {
    string_t* str = init_string("hello world");
-   char* end = string_end_pointer(str);
+   char* end = last_char(str);
    
    assert_non_null(end);
    assert_int_equal(*end, 'd');  // Last character should be 'd'
@@ -570,7 +570,7 @@ void test_string_end_pointer_nominal(void **state) {
 
 void test_string_end_pointer_single_char(void **state) {
    string_t* str = init_string("x");
-   char* end = string_end_pointer(str);
+   char* end = last_char(str);
    
    assert_non_null(end);
    assert_int_equal(*end, 'x');
@@ -582,7 +582,7 @@ void test_string_end_pointer_single_char(void **state) {
 
 void test_string_end_pointer_empty(void **state) {
    string_t* str = init_string("");
-   char* end = string_end_pointer(str);
+   char* end = last_char(str);
    
    // For empty string, end pointer should still be valid but point to position -1
    // from the null terminator
@@ -593,7 +593,7 @@ void test_string_end_pointer_empty(void **state) {
 // -------------------------------------------------------------------------------- 
 
 void test_string_end_pointer_null(void **state) {
-   char* end = string_end_pointer(NULL);
+   char* end = last_char(NULL);
    assert_null(end);
    assert_int_equal(errno, EINVAL);
 }
@@ -601,12 +601,247 @@ void test_string_end_pointer_null(void **state) {
 
 void test_pointer_arithmetic(void **state) {
    string_t* str = init_string("hello");
-   char* start = string_start_pointer(str);
-   char* end = string_end_pointer(str);
+   char* start = first_char(str);
+   char* end = last_char(str);
    
    assert_int_equal(end - start, 4);  // "hello" is 5 chars, end points to 'o'
    
    free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+/* Tests using string literal (char*) substring */
+void test_first_substr_literal_nominal(void **state) {
+   string_t* str = init_string("hello world hello there");
+   char* result = first_substr_occurrence(str, "hello");
+   
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 0);  // First occurrence at start
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_literal_middle(void **state) {
+   string_t* str = init_string("world hello there");
+   char* result = first_substr_occurrence(str, "hello");
+   
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 6);  // "hello" starts at position 6
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_literal_not_found(void **state) {
+   string_t* str = init_string("hello world");
+   char* result = first_substr_occurrence(str, "xyz");
+   
+   assert_null(result);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_first_substr_literal_empty_substring(void **state) {
+   string_t* str = init_string("hello world");
+   char* result = first_substr_occurrence(str, "");
+   
+   assert_non_null(result);
+   assert_ptr_equal(result, get_string(str));  // Empty string matches at start
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_first_substr_literal_too_long(void **state) {
+   string_t* str = init_string("hi");
+   char* result = first_substr_occurrence(str, "hello");
+   
+   assert_null(result);
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+/* Tests using string_t substring */
+void test_first_substr_string_nominal(void **state) {
+   string_t* str = init_string("hello world hello there");
+   string_t* sub = init_string("hello");
+   
+   char* result = first_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 0);
+   
+   free_string(str);
+   free_string(sub);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_string_middle(void **state) {
+   string_t* str = init_string("world hello there");
+   string_t* sub = init_string("hello");
+   
+   char* result = first_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 6);
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_first_substr_string_not_found(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* sub = init_string("xyz");
+   
+   char* result = first_substr_occurrence(str, sub);
+   assert_null(result);
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_first_substr_string_empty(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* sub = init_string("");
+   
+   char* result = first_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_ptr_equal(result, get_string(str));
+   
+   free_string(str);
+   free_string(sub);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_string_too_long(void **state) {
+   string_t* str = init_string("hi");
+   string_t* sub = init_string("hello");
+   
+   char* result = first_substr_occurrence(str, sub);
+   assert_null(result);
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+/* Tests using string literal (char*) substring */
+void test_last_substr_literal_nominal(void **state) {
+   string_t* str = init_string("hello world hello there");
+   char* result = last_substr_occurrence(str, "hello");
+   
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 12);  // Second "hello" starts at position 12
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_single_occurrence(void **state) {
+   string_t* str = init_string("hello world");
+   char* result = last_substr_occurrence(str, "world");
+   
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 6);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_not_found(void **state) {
+   string_t* str = init_string("hello world");
+   char* result = last_substr_occurrence(str, "xyz");
+   
+   assert_null(result);
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_last_substr_literal_empty_substring(void **state) {
+   string_t* str = init_string("hello world");
+   char* result = last_substr_occurrence(str, "");
+   
+   assert_non_null(result);
+   assert_ptr_equal(result, get_string(str) + string_size(str));  // Empty string matches at end
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_too_long(void **state) {
+   string_t* str = init_string("hi");
+   char* result = last_substr_occurrence(str, "hello");
+   
+   assert_null(result);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_nominal(void **state) {
+   string_t* str = init_string("hello world hello there hello");
+   string_t* sub = init_string("hello");
+   
+   char* result = last_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 18);  // Last "hello" position
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_single_occurrence(void **state) {
+   string_t* str = init_string("world hello there");
+   string_t* sub = init_string("hello");
+   
+   char* result = last_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_int_equal(result - get_string(str), 6);
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_not_found(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* sub = init_string("xyz");
+   
+   char* result = last_substr_occurrence(str, sub);
+   assert_null(result);
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_empty(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* sub = init_string("");
+   
+   char* result = last_substr_occurrence(str, sub);
+   assert_non_null(result);
+   assert_ptr_equal(result, get_string(str) + string_size(str));
+   
+   free_string(str);
+   free_string(sub);
+}
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_too_long(void **state) {
+   string_t* str = init_string("hi");
+   string_t* sub = init_string("hello");
+   
+   char* result = last_substr_occurrence(str, sub);
+   assert_null(result);
+   
+   free_string(str);
+   free_string(sub);
 }
 // ================================================================================
 // ================================================================================

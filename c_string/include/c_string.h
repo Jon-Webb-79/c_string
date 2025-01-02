@@ -267,7 +267,7 @@ char* last_char_occurance(string_t* str, char value);
 * @return Pointer to the beginning of the first occurrence of sub_str, or NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* first_lit_substr_occurance(string_t* str, char* sub_str);
+char* first_lit_substr_occurrence(string_t* str, char* sub_str);
 // --------------------------------------------------------------------------------
 
 /**
@@ -279,7 +279,7 @@ char* first_lit_substr_occurance(string_t* str, char* sub_str);
 * @return Pointer to the beginning of the first occurrence of str_2, or NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* first_string_substr_occurance(string_t* str_1, string_t* str_2);
+char* first_string_substr_occurrence(string_t* str_1, string_t* str_2);
 // -------------------------------------------------------------------------------- 
 
 /**
@@ -294,9 +294,9 @@ char* first_string_substr_occurance(string_t* str_1, string_t* str_2);
 *     first_substr_occurance(str, "substring")     // Uses literal version
 *     first_substr_occurance(str1, str2)          // Uses string_t version
 */
-#define first_substr_occurance(str1, str2) _Generic((str2) \
-    char*: first_lit_substr_occurance \
-    string_t*: first_string_substr_occurance) (str1, str2)
+#define first_substr_occurrence(str1, str2) _Generic((str2), \
+    char*: first_lit_substr_occurrence, \
+    string_t*: first_string_substr_occurrence) (str1, str2)
 // -------------------------------------------------------------------------------- 
 
 /**
@@ -308,7 +308,7 @@ char* first_string_substr_occurance(string_t* str_1, string_t* str_2);
 * @return Pointer to the beginning of the last occurrence of sub_str, or NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* last_lit_substr_occurance(string_t* str, char* sub_str);
+char* last_lit_substr_occurrence(string_t* str, char* sub_str);
 // --------------------------------------------------------------------------------
 
 /**
@@ -320,7 +320,7 @@ char* last_lit_substr_occurance(string_t* str, char* sub_str);
 * @return Pointer to the beginning of the last occurrence of str_2, or NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* last_string_substr_occurance(string_t* str_1, string_t* str_2);
+char* last_string_substr_occurrence(string_t* str_1, string_t* str_2);
 // -------------------------------------------------------------------------------- 
 
 /**
@@ -335,31 +335,34 @@ char* last_string_substr_occurance(string_t* str_1, string_t* str_2);
 *     last_substr_occurance(str, "substring")      // Uses literal version
 *     last_substr_occurance(str1, str2)           // Uses string_t version
 */
-#define last_substr_occurance(str1, str2) _Generic((str2) \
-    char*: last_lit_substr_occurance \
-    string_t*: last_string_substr_occurance) (str1, str2)
+#define last_substr_occurrence(str1, str2) _Generic((str2), \
+    char*: last_lit_substr_occurrence, \
+    string_t*: last_string_substr_occurrence) (str1, str2)
 // --------------------------------------------------------------------------------
 
 /**
-* @function string_start_pointer
+* @function first_char
 * @brief Returns a pointer to the beginning of a string
 *
 * @param str A string_t object
 * @return Pointer to the beginning of the string NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* string_start_pointer(string_t* str);
+char* first_char(string_t* str);
 // --------------------------------------------------------------------------------
 
 /**
-* @function string_start_pointer
+* @function last_char
 * @brief Returns a pointer to the end of a string
 *
 * @param str A string_t object
 * @return Pointer to the end of the string NULL if not found
 *         Sets errno to EINVAL if either input is NULL
 */
-char* string_end_pointer(string_t* str);
+char* last_char(string_t* str);
+// --------------------------------------------------------------------------------
+
+
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

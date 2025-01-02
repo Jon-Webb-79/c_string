@@ -635,9 +635,9 @@ Output::
    Last 'l' at position: 9
    Number of characters between: 7
 
-string_start_pointer
-~~~~~~~~~~~~~~~~~~~~
-.. c:function:: char* string_start_pointer(string_t* str)
+first_char
+~~~~~~~~~~
+.. c:function:: char* first_char(string_t* str)
 
   Returns a pointer to the beginning of the string stored in a ``string_t`` object.
   Similar to begin() in C++ string class.
@@ -650,14 +650,13 @@ string_start_pointer
 
   .. code-block:: c
 
-     string_t* str = init_string("Hello World");
+     string_t* str STRING_GBC = init_string("Hello World");
      if (str) {
-         char* start = string_start_pointer(str);
+         char* start = first_char(str);
          if (start) {
              printf("First character: %c\n", *start);
              printf("First two chars: %.2s\n", start);
          }
-         free_string(str);
      }
 
   Output::
@@ -665,9 +664,9 @@ string_start_pointer
      First character: H
      First two chars: He
 
-string_end_pointer
-~~~~~~~~~~~~~~~~~~
-.. c:function:: char* string_end_pointer(string_t* str)
+last_char
+~~~~~~~~~
+.. c:function:: char* last_char(string_t* str)
 
   Returns a pointer to the last character of the string stored in a ``string_t`` object.
   Note: This points to the last actual character, not the null terminator.
@@ -680,17 +679,16 @@ string_end_pointer
 
   .. code-block:: c
 
-     string_t* str = init_string("Hello World");
+     string_t* str STRING_GBC = init_string("Hello World");
      if (str) {
-         char* start = string_start_pointer(str);
-         char* end = string_end_pointer(str);
+         char* start = first_char(str);
+         char* end = last_char(str);
          
          if (start && end) {
              printf("First character: %c\n", *start);
              printf("Last character: %c\n", *end);
              printf("String length: %td\n", end - start + 1);
          }
-         free_string(str);
      }
 
   Output::
@@ -698,3 +696,219 @@ string_end_pointer
      First character: H
      Last character: d
      String length: 11
+
+.. _first-lit-substr-func:
+
+first_lit_substr_occurance
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* first_lit_substr_occurance(string_t* str, char* sub_str)
+
+  Finds the first occurrence of a C string literal substring within a ``string_t`` object.
+  Similar to strstr() from the C standard library.  The user can also implement 
+  :ref:`first_substr_occurance <first-substr-macro>` macro in place of this function.
+
+  :param str: ``string_t`` object to search within
+  :param sub_str: C string literal to search for
+  :returns: Pointer to first character of substring if found, NULL otherwise
+  :raises: Sets errno to EINVAL if either input is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     char* result = first_lit_substr_occurance(str, "world");
+     
+     if (result) {
+         printf("Found 'world' at position: %td\n", result - get_string(str));
+         printf("Remaining string: %s\n", result);
+     }
+     
+     free_string(str);
+
+  Output::
+
+     Found 'world' at position: 6
+     Remaining string: world hello there
+
+.. _first-str-substr-func:
+
+first_string_substr_occurrence
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* first_string_substr_occurrence(string_t* str, string_t* sub_str)
+
+  Finds the first occurrence of a ``string_t`` substring within another ``string_t`` object.
+  The developer can also implement the :ref:`first_substr_occurance() <first-substr-macro>`
+  Macro in place of this function.
+
+  :param str: ``string_t`` object to search within
+  :param sub_str: ``string_t`` object containing the substring to search for
+  :returns: Pointer to first character of substring if found, NULL otherwise
+  :raises: Sets errno to EINVAL if either input is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     string_t* sub = init_string("world");
+     
+     char* result = first_string_substr_occurrence(str, sub);
+     if (result) {
+         printf("Found substring at position: %td\n", result - get_string(str));
+     }
+     
+     free_string(str);
+     free_string(sub);
+
+  Output::
+
+     Found substring at position: 6
+
+.. _first-substr-macro:
+
+first_substr_occurrence
+~~~~~~~~~~~~~~~~~~~~~~~
+.. c:macro:: first_substr_occurance(str1, str2)
+
+  A generic macro that selects the appropriate substring search function based on
+  the type of the second argument. Provides a unified interface for substring
+  searching regardless of the substring type.  This macro wraps the 
+  :ref:`first_lit_substr_occurrence() <first-lit-substr-func>` and 
+  :ref:`first_string_substr_occurrence() <first-str-substr-func>` functions
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     string_t* sub = init_string("world");
+     
+     // Using with string literal
+     char* result1 = first_substr_occurrence(str, "hello");
+     if (result1) {
+         printf("Found 'hello' at position: %td\n", result1 - get_string(str));
+     }
+     
+     // Using with string_t
+     char* result2 = first_substr_occurance(str, sub);
+     if (result2) {
+         printf("Found 'world' at position: %td\n", result2 - get_string(str));
+     }
+     
+     free_string(str);
+     free_string(sub);
+
+  Output::
+
+     Found 'hello' at position: 0
+     Found 'world' at position: 6
+
+.. _last-lit-substr-func:
+
+last_lit_substr_occurrence
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* last_lit_substr_occurrence(string_t* str, char* sub_str)
+
+  Finds the last occurrence of a C string literal substring within a ``string_t`` object.
+  Similar to strstr() but searches from end to beginning.  Developer can use the 
+  generic :ref:`last_substr_occurrence() <last-substr-macro>` macro in place of this function.
+
+  :param str: ``string_t`` object to search within
+  :param sub_str: C string literal to search for
+  :returns: Pointer to first character of last substring match if found, NULL otherwise
+  :raises: Sets errno to EINVAL if either input is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     char* result = last_lit_substr_occurrence(str, "hello");
+     
+     if (result) {
+         printf("Last 'hello' found at position: %td\n", result - get_string(str));
+         printf("Remaining string: %s\n", result);
+     }
+     
+     free_string(str);
+
+  Output::
+
+     Last 'hello' found at position: 12
+     Remaining string: hello there
+
+.. _last-string-substr-func:
+
+last_string_substr_occurrence
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: char* last_string_substr_occurrence(string_t* str, string_t* sub_str)
+
+  Finds the last occurrence of a ``string_t`` substring within another ``string_t`` object.
+  Developer can use the generic :ref:`last_substr_occurrence() <last-substr-macro>` 
+  macro in place of this function.
+
+  :param str: ``string_t`` object to search within
+  :param sub_str: ``string_t`` object containing the substring to search for
+  :returns: Pointer to first character of last substring match if found, NULL otherwise
+  :raises: Sets errno to EINVAL if either input is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     string_t* sub = init_string("hello");
+     
+     char* result = last_string_substr_occurrence(str, sub);
+     if (result) {
+         printf("Last occurrence found at position: %td\n", result - get_string(str));
+         printf("Text from match onwards: %s\n", result);
+     }
+     
+     free_string(str);
+     free_string(sub);
+
+  Output::
+
+     Last occurrence found at position: 12
+     Text from match onwards: hello there
+
+.. _last-substr-macro:
+
+last_substr_occurrence
+~~~~~~~~~~~~~~~~~~~~~~
+.. c:macro:: last_substr_occurrence(str1, str2)
+
+  A generic macro that selects the appropriate substring search function based on
+  the type of the second argument. Provides a unified interface for finding the
+  last occurrence of a substring regardless of the substring type.  This macro 
+  wraps the :ref:`last_lit_substr_occurrence() <last-lit-substr-func>` 
+  and :ref:`last_string_substr_occurrence() <last-string-substr-func>` functions.
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there hello");
+     string_t* sub = init_string("hello");
+     
+     // Using with string literal
+     char* result1 = last_substr_occurrence(str, "hello");
+     if (result1) {
+         printf("Last 'hello' using literal at: %td\n", result1 - get_string(str));
+     }
+     
+     // Using with string_t
+     char* result2 = last_substr_occurrence(str, sub);
+     if (result2) {
+         printf("Last 'hello' using string_t at: %td\n", result2 - get_string(str));
+     }
+     
+     free_string(str);
+     free_string(sub);
+
+  Output::
+
+     Last 'hello' using literal at: 18
+     Last 'hello' using string_t at: 18

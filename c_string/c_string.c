@@ -321,7 +321,139 @@ char* last_char_occurance(string_t* str, char value) {
 }
 // --------------------------------------------------------------------------------
 
-char* string_start_pointer(string_t* str) {
+char* first_lit_substr_occurrence(string_t* str, char* sub_str) {
+    if (!str || !str->str || !sub_str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    size_t sub_len = strlen(sub_str);
+    
+    // Check if substring is longer than main string
+    if (sub_len > str->len) {
+        return NULL;
+    }
+    
+    char* min_ptr = first_char(str);
+    // Only need to check up to the point where substring could still fit
+    char* max_ptr = min_ptr + (str->len - sub_len);
+    
+    for (char* it = min_ptr; it <= max_ptr; it++) {
+        size_t j;
+        for (j = 0; j < sub_len; j++) {
+            if (sub_str[j] != *(it + j)) {
+                break;
+            }
+        }
+        if (j == sub_len) {
+            return it;
+        }
+    }
+    
+    return NULL;
+}
+// -------------------------------------------------------------------------------- 
+
+char* first_string_substr_occurrence(string_t* str, string_t* sub_str) {
+    if (!str || !str->str || !sub_str || !sub_str->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    size_t sub_len = sub_str->len;
+    
+    // Check if substring is longer than main string
+    if (sub_len > str->len) {
+        return NULL;
+    }
+    
+    char* min_ptr = first_char(str);
+    // Only need to check up to the point where substring could still fit
+    char* max_ptr = min_ptr + (str->len - sub_len);
+    
+    for (char* it = min_ptr; it <= max_ptr; it++) {
+        size_t j;
+        for (j = 0; j < sub_len; j++) {
+            if (sub_str->str[j] != *(it + j)) {
+                break;
+            }
+        }
+        if (j == sub_len) {
+            return it;
+        }
+    }
+    
+    return NULL;
+}
+// --------------------------------------------------------------------------------
+
+char* last_lit_substr_occurrence(string_t* str, char* sub_str) {
+    if (!str || !str->str || !sub_str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    size_t sub_len = strlen(sub_str);
+    
+    // Check if substring is longer than main string
+    if (sub_len > str->len) {
+        return NULL;
+    }
+    
+    char* min_ptr = first_char(str);
+    // Only need to check up to the point where substring could still fit
+    char* max_ptr = min_ptr + (str->len - sub_len);
+    
+    for (char* it = max_ptr; it >= min_ptr; it--) {
+        size_t j;
+        for (j = 0; j < sub_len; j++) {
+            if (sub_str[j] != *(it + j)) {
+                break;
+            }
+        }
+        if (j == sub_len) {
+            return it;
+        }
+    }
+    
+    return NULL;
+}
+// -------------------------------------------------------------------------------- 
+
+char* last_string_substr_occurrence(string_t* str, string_t* sub_str) {
+   if (!str || !str->str || !sub_str || !sub_str->str) {
+       errno = EINVAL;
+       return NULL;
+   }
+   
+   size_t sub_len = sub_str->len;
+   
+   // Check if substring is longer than main string
+   if (sub_len > str->len) {
+       return NULL;
+   }
+   
+   char* min_ptr = first_char(str);
+   // Only need to check up to the point where substring could still fit
+   char* max_ptr = min_ptr + (str->len - sub_len);
+   
+   for (char* it = max_ptr; it >= min_ptr; it--) {
+       size_t j;
+       for (j = 0; j < sub_len; j++) {
+           if (sub_str->str[j] != *(it + j)) {
+               break;
+           }
+       }
+       if (j == sub_len) {
+           return it;
+       }
+   }
+   
+   return NULL;
+}
+// --------------------------------------------------------------------------------
+
+char* first_char(string_t* str) {
     if (!str || !str->str) {
         errno = EINVAL;
         return NULL;
@@ -331,7 +463,7 @@ char* string_start_pointer(string_t* str) {
 }
 // --------------------------------------------------------------------------------
 
-char* string_end_pointer(string_t* str) {
+char* last_char(string_t* str) {
     if (!str || !str->str) {
         errno = EINVAL;
         return NULL;

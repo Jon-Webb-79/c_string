@@ -181,6 +181,69 @@ void test_string_end_pointer_null(void **state);
 // --------------------------------------------------------------------------------
 
 void test_pointer_arithmetic(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_literal_nominal(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_literal_middle(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_literal_not_found(void **state);
+// --------------------------------------------------------------------------------
+
+void test_first_substr_literal_empty_substring(void **state);
+// --------------------------------------------------------------------------------
+
+void test_first_substr_literal_too_long(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_string_nominal(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_string_middle(void **state);
+// --------------------------------------------------------------------------------
+
+void test_first_substr_string_not_found(void **state);
+// --------------------------------------------------------------------------------
+
+void test_first_substr_string_empty(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_string_too_long(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_first_substr_null_inputs(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_nominal(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_single_occurrence(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_not_found(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_last_substr_literal_empty_substring(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_literal_too_long(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_nominal(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_single_occurrence(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_not_found(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_empty(void **state);
+// --------------------------------------------------------------------------------
+
+void test_last_substr_string_too_long(void **state);
 // ================================================================================
 // ================================================================================ 
 #endif /* test_string_H */
