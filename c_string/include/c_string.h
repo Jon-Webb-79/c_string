@@ -375,14 +375,55 @@ char* last_char(string_t* str);
 bool is_string_ptr(string_t* str, char* ptr);
 // --------------------------------------------------------------------------------
 
+/**
+* @function drop_lit_substr
+* @brief Removes all occurrences of a C string literal substring between two pointers.
+*
+* Searches from end to beginning of the specified range and removes each occurrence
+* of the substring, preserving existing spaces between words.
+*
+* @param string string_t object to modify
+* @param substring C string literal to remove
+* @param min_ptr Pointer to start of search range within string
+* @param max_ptr Pointer to end of search range within string
+* @return bool true if successful (including when no matches found), false on error
+*         Sets errno to EINVAL if inputs are NULL or range invalid
+*         Sets errno to ERANGE if pointers are out of bounds
+*/
 bool drop_lit_substr(string_t* string, char* substring, char* min_ptr,
                      char* max_ptr);
 // -------------------------------------------------------------------------------- 
 
+/**
+* @function drop_string_substr
+* @brief Removes all occurrences of a string_t substring between two pointers.
+*
+* Searches from end to beginning of the specified range and removes each occurrence
+* of the substring, preserving existing spaces between words.
+*
+* @param string string_t object to modify
+* @param substring string_t object containing substring to remove
+* @param min_ptr Pointer to start of search range within string
+* @param max_ptr Pointer to end of search range within string
+* @return bool true if successful (including when no matches found), false on error
+*         Sets errno to EINVAL if inputs are NULL or range invalid
+*         Sets errno to ERANGE if pointers are out of bounds
+*/
 bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr,
                         char* max_ptr);
 // -------------------------------------------------------------------------------- 
 
+/**
+* @macro drop_substr
+* @brief Generic macro that selects appropriate substring removal function based on type.
+*
+* If the substring is char*, calls drop_lit_substr.
+* If the substring is string_t*, calls drop_string_substr.
+*
+* Example usage:
+*     drop_substr(str, "hello", start, end)      // Uses literal version
+*     drop_substr(str1, str2, start, end)        // Uses string_t version
+*/
 #define drop_substr(string, substr, min_ptr, max_ptr) _Generic((substr), \
     char*: drop_lit_substr, \
     string_t*: drop_string_substr) (string, substr, min_ptr, max_ptr)

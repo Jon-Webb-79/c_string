@@ -432,16 +432,20 @@ drop_lit_substr
   .. code-block:: c
 
      string_t* str STRING_GBC = init_string("hello world hello there hello");
+     printf("Initial length: %ld\n", string_size(str));
      char* start = first_char(str);
      char* end = last_char(str);
      
      if (drop_lit_substr(str, "hello", start, end)) {
          printf("Result: '%s'\n", get_string(str));
+         printf("Final length: %ld\n", string_size(str));
      }
 
   Output::
 
+     Initial Length: 29
      Result: 'world there '
+     Final length: 11
 
 .. _drop-string-substr-func:
 
@@ -467,16 +471,20 @@ drop_string_substr
 
      string_t* str STRING_GBC = init_string("hello world hello there hello");
      string_t* sub STRING_GBC = init_string("hello");
+     printf("Initial length: %ld\n", string_size(str));
      char* start = first_char(str);
      char* end = last_char(str);
      
      if (drop_string_substr(str, sub, start, end)) {
          printf("Result: '%s'\n", get_string(str));
+         printf("Final length: %ld\n", string_size(str));
      }
 
   Output::
 
+     Initial Length: 29
      Result: 'world there '
+     Final length: 11
 
 .. _drop-substr-macro:
 
