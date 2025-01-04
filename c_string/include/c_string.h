@@ -601,6 +601,39 @@ char get_char(string_t* str, size_t index);
  *
  */
 void replace_char(string_t* str, size_t index, char value);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function trim_leading_whitespace 
+ * @brief Removes any white space at the leading edge of a string 
+ *
+ * Sets errno to EINVAL if str or str->str is NULL
+ *
+ * @param str A string_t data type 
+ */
+void trim_leading_whitespace(string_t* str);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function trim_trailing_whitespace 
+ * @brief Removes any white space at the trailing edge of a string 
+ *
+ * Sets errno to EINVAL if str or str->str is NULL
+ *
+ * @param str A string_t data type 
+ */
+void trim_trailing_whitespace(string_t* str);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function trim_all_whitespace 
+ * @brief Removes all white space in a string 
+ *
+ * Sets errno to EINVAL if str or str->str is NULL
+ *
+ * @param str A string_t data type 
+ */
+void trim_all_whitespace(string_t* str);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

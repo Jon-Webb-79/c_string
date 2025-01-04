@@ -18,6 +18,7 @@
 #include <stdlib.h> // For size_t, malloc, and realloc
 #include <string.h> // For strerror
 #include <limits.h> // For INT_MIN
+#include <ctype.h>  // For isspace
 // ================================================================================ 
 // ================================================================================ 
 // STRING_T DATA TYPE 
@@ -902,6 +903,98 @@ void replace_char(string_t* str, size_t index, char value) {
         return;
     }
     str->str[index] = value;
+}
+// --------------------------------------------------------------------------------
+
+void trim_leading_whitespace(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return;
+    }
+    
+    if (str->len == 0) {
+        return;
+    }
+    
+    // Find first non-whitespace character
+    char* ptr = str->str;
+    while (*ptr && isspace(*ptr)) {
+        ptr++;
+    }
+    
+    // If no leading whitespace found, return
+    if (ptr == str->str) {
+        return;
+    }
+    
+    // Calculate number of whitespace characters
+    size_t whitespace_count = ptr - str->str;
+    
+    // Move remaining string to front
+    memmove(str->str, ptr, str->len - whitespace_count + 1);  // +1 for null terminator
+    
+    // Update length
+    str->len -= whitespace_count;
+    
+    return;
+}
+// -------------------------------------------------------------------------------- 
+
+void trim_trailing_whitespace(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return;
+    }
+    
+    if (str->len == 0) {
+        return;
+    }
+    
+    // Start from last character (before null terminator)
+    char* ptr = str->str + str->len - 1;
+    
+    // Move backwards while finding whitespace
+    while (ptr >= str->str && (*ptr == ' ' || *ptr == '\t' || *ptr == '\n')) {
+        ptr--;
+    }
+    
+    // Set new end of string
+    ptr++;  // Move to one after last non-whitespace char
+    *ptr = '\0';
+    
+    // Update length (ptr - str->str gives new length)
+    str->len = ptr - str->str;
+}
+// --------------------------------------------------------------------------------
+
+void trim_all_whitespace(string_t* str) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return;
+    }
+    
+    if (str->len == 0) {
+        return;
+    }
+    
+    char* read = str->str;
+    char* write = str->str;
+    
+    while (*read) {
+        if (*read != ' ' && *read != '\t' && *read != '\n') {
+            *write = *read;
+            write++;
+        }
+        read++;
+    }
+    
+    // Null terminate the string at the new position
+    *write = '\0';
+    
+    // Update length (write - str->str gives new length)
+    str->len = write - str->str;
+    
+    return;
 }
 // ================================================================================
 // ================================================================================

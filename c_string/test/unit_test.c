@@ -149,6 +149,15 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_replace_char_out_of_bounds),
         cmocka_unit_test(test_replace_char_null),
         cmocka_unit_test(test_replace_char_special_chars),
+        cmocka_unit_test(test_trim_leading_nominal),
+        cmocka_unit_test(test_trim_leading_multiple_types),
+        cmocka_unit_test(test_trim_leading_no_whitespace),
+        cmocka_unit_test(test_trim_trailing_nominal),
+        cmocka_unit_test(test_trim_trailing_multiple_types),
+        cmocka_unit_test(test_trim_trailing_no_whitespace),
+        cmocka_unit_test(test_trim_all_nominal),
+        cmocka_unit_test(test_trim_all_multiple_types),
+        cmocka_unit_test(test_trim_all_no_whitespace),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

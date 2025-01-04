@@ -738,6 +738,84 @@ replace_char
      After capitalizing first letter: Hello
      After replacing last letter: Hell!
 
+String Whitespace Trimming
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+trim_leading_whitespace
+^^^^^^^^^^^^^^^^^^^^^^^
+.. c:function:: void trim_leading_whitespace(string_t* str)
+
+  Removes all whitespace characters (spaces, tabs, newlines) from the beginning of a string.
+  The rest of the string, including any internal whitespace, remains unchanged.
+
+  :param str: ``string_t`` object to modify
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("   hello world  ");
+     printf("Before: '%s'\n", get_string(str));
+     
+     trim_leading_whitespace(str);
+     printf("After:  '%s'\n", get_string(str));
+     
+  Output::
+
+     Before: '   hello world  '
+     After:  'hello world  '
+
+trim_trailing_whitespace
+^^^^^^^^^^^^^^^^^^^^^^^^
+.. c:function:: void trim_trailing_whitespace(string_t* str)
+
+  Removes all whitespace characters (spaces, tabs, newlines) from the end of a string.
+  The rest of the string, including any internal whitespace, remains unchanged.
+
+  :param str: ``string_t`` object to modify
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello   world   ");
+     printf("Before: '%s'\n", get_string(str));
+     
+     trim_trailing_whitespace(str);
+     printf("After:  '%s'\n", get_string(str));
+
+  Output::
+
+     Before: 'hello   world   '
+     After:  'hello   world'
+
+trim_all_whitespace
+^^^^^^^^^^^^^^^^^^^
+.. c:function:: void trim_all_whitespace(string_t* str)
+
+  Removes all whitespace characters (spaces, tabs, newlines) from throughout the string,
+  including leading, trailing, and between words.
+
+  :param str: ``string_t`` object to modify
+  :raises: Sets errno to EINVAL if str is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("  hello   world  there  ");
+     printf("Before: '%s'\n", get_string(str));
+     
+     trim_all_whitespace(str);
+     printf("After:  '%s'\n", get_string(str));
+
+  Output::
+
+     Before: '  hello   world  there  '
+     After:  'helloworldthere'
+
 String Comparison Functions
 ---------------------------
 The functions and Macros in this section are used to compare to strings 

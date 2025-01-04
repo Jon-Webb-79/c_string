@@ -1403,7 +1403,6 @@ void test_token_count_mixed_delimiters(void **state) {
 }
 // --------------------------------------------------------------------------------
 
-/* Tests for get_char */
 void test_get_char_nominal(void **state) {
    string_t* str = init_string("hello");
    
@@ -1481,6 +1480,143 @@ void test_replace_char_special_chars(void **state) {
    assert_int_equal(get_char(str, 2), '\t');
    
    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_leading_nominal(void **state) {
+   string_t* str = init_string("   hello world");
+   trim_leading_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_leading_multiple_types(void **state) {
+   string_t* str = init_string("\t\n hello world");
+   trim_leading_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_leading_no_whitespace(void **state) {
+   string_t* str = init_string("hello world");
+   trim_leading_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_trailing_nominal(void **state) {
+   string_t* str = init_string("hello world   ");
+   trim_trailing_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_trailing_multiple_types(void **state) {
+   string_t* str = init_string("hello world\t\n ");
+   trim_trailing_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_trailing_no_whitespace(void **state) {
+   string_t* str = init_string("hello world");
+   trim_trailing_whitespace(str);
+   
+   assert_string_equal(get_string(str), "hello world");
+   assert_int_equal(string_size(str), 11);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_all_nominal(void **state) {
+    string_t* str = init_string("hello   world  there");
+    trim_all_whitespace(str);
+    assert_string_equal(get_string(str), "helloworldthere");
+     assert_int_equal(string_size(str), 15);
+   
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_all_multiple_types(void **state) {
+    string_t* str = init_string("hello\t\nworld \tthere");
+    trim_all_whitespace(str);
+    assert_string_equal(get_string(str), "helloworldthere");
+    assert_int_equal(string_size(str), 15);
+   
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_all_no_whitespace(void **state) {
+    string_t* str = init_string("helloworld");
+    trim_all_whitespace(str);
+     
+    assert_string_equal(get_string(str), "helloworld");
+    assert_int_equal(string_size(str), 10);
+   
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_null_input(void **state) {
+    // Test all three functions with NULL input
+    trim_leading_whitespace(NULL);
+    assert_int_equal(errno, EINVAL);
+     
+    trim_trailing_whitespace(NULL);
+    assert_int_equal(errno, EINVAL);
+   
+    trim_all_whitespace(NULL);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_trim_all_whitespace_string(void **state) {
+    string_t* str = init_string("   \t\n   ");
+   
+    trim_leading_whitespace(str);
+    assert_string_equal(get_string(str), "");
+    assert_int_equal(string_size(str), 0);
+   
+    // Reset string
+    free_string(str);
+    str = init_string("   \t\n   ");
+   
+    trim_trailing_whitespace(str);
+    assert_string_equal(get_string(str), "");
+    assert_int_equal(string_size(str), 0);
+   
+    // Reset string
+    free_string(str);
+    str = init_string("   \t\n   ");
+   
+    trim_all_whitespace(str);
+    assert_string_equal(get_string(str), "");
+    assert_int_equal(string_size(str), 0);
+   
+    free_string(str);
 }
 // ================================================================================
 // ================================================================================
