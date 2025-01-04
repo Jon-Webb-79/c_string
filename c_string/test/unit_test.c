@@ -116,7 +116,15 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_replace_substr_string_shorter_replacement),
         cmocka_unit_test(test_replace_substr_string_longer_replacement),
         cmocka_unit_test(test_replace_substr_string_partial_range),
-        cmocka_unit_test(test_replace_substr_invalid_range)
+        cmocka_unit_test(test_replace_substr_invalid_range),
+        cmocka_unit_test(test_lowercase_char_nominal),
+        cmocka_unit_test(test_uppercase_char_nominal),
+        cmocka_unit_test(test_lowercase_char_null_value),
+        cmocka_unit_test(test_uppercase_char_nominal),
+        cmocka_unit_test(test_uppercase_string_nominal),
+        cmocka_unit_test(test_lowercase_string_nominal),
+        cmocka_unit_test(test_uppercase_string_null),
+        cmocka_unit_test(test_lowercase_string_null),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

@@ -606,6 +606,11 @@ bool replace_lit_substr(string_t* string, const char* pattern, const char* repla
         errno = ERANGE;
         return false;
     } 
+
+    if (min_ptr > max_ptr) {
+        errno = ERANGE;
+        return false;
+    }
     
     // Calculate the delta between the pattern and replacement lengths.
     int delta = strlen(replace_string) - strlen(pattern);
@@ -695,7 +700,12 @@ bool replace_string_substr(string_t* string, const string_t* pattern, const stri
     if (!is_string_ptr(string, min_ptr) || !is_string_ptr(string, max_ptr)) {
         errno = ERANGE;
         return false;
-    } 
+    }
+
+    if (min_ptr > max_ptr) {
+        errno = ERANGE;
+        return false;
+    }
    
     // Calculate the delta between the pattern and replacement lengths.
     int delta = replace_string->len - pattern->len;
@@ -757,6 +767,50 @@ bool replace_string_substr(string_t* string, const string_t* pattern, const stri
    
     string->str[string->len] = '\0';
     return true;
+}
+// --------------------------------------------------------------------------------
+
+void to_upper_char(char* val) {
+    if (!val) {
+        errno = EINVAL;
+        return;
+    }
+    if (*val >= 'a' && *val <= 'z') *val -= 32; 
+}
+// --------------------------------------------------------------------------------
+
+void to_lower_char(char* val) {
+    if (!val) {
+        errno = EINVAL;
+        return;
+    }
+    if (*val >= 'A' && *val <= 'Z') *val += 32; 
+}
+// --------------------------------------------------------------------------------
+
+void to_uppercase(string_t *s) {
+    if(!s || !s->str) {
+        errno = EINVAL;
+        return;
+    }
+    char* begin = s->str;
+    char* end = s->str + s->len;
+    for (char* i =  begin; i != end; i++) {
+        if (*i >= 'a' && *i <= 'z') *i -= 32;
+    }
+}
+// --------------------------------------------------------------------------------
+
+void to_lowercase(string_t *s) {
+    if(!s || !s->str) {
+        errno = EINVAL;
+        return;
+    }
+    char* begin = s->str;
+    char* end = s->str + s->len;
+    for (char* i =  begin; i != end; i++) {
+        if (*i >= 'A' && *i <= 'Z') *i += 32;
+    }
 }
 // ================================================================================
 // ================================================================================

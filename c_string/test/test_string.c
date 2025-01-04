@@ -1134,7 +1134,7 @@ void test_replace_substr_invalid_range(void **state) {
     bool val = replace_substr(str, "test", "new", end, start); 
     // Test with end before start
     assert_false(val);
-    assert_int_equal(errno, EINVAL);
+    assert_int_equal(errno, ERANGE);
    
     // Test with out of bounds pointers
     assert_false(replace_substr(str, "test", "new", start - 1, end));
@@ -1143,6 +1143,60 @@ void test_replace_substr_invalid_range(void **state) {
     fclose(stderr);
     stderr = original_stderr; 
     free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_uppercase_char_nominal(void **state) {
+    char val = 'a';
+    to_upper_char(&val);
+    assert_int_equal('A', val);
+}
+// --------------------------------------------------------------------------------
+
+void test_lowercase_char_nominal(void **state) {
+    char val = 'A';
+    to_lower_char(&val);
+    assert_int_equal('a', val);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_uppercase_char_null_value(void **state) {
+    to_upper_char(NULL);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_lowercase_char_null_value(void **state) {
+    to_lower_char(NULL);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_uppercase_string_nominal(void **state) {
+    string_t* str = init_string("hello");
+    to_uppercase(str);
+    assert_string_equal("HELLO", get_string(str));
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_lowercase_string_nominal(void **state) {
+    string_t* str = init_string("HELLO");
+    to_lowercase(str);
+    assert_string_equal("hello", get_string(str));
+    free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_uppercase_string_null(void **state) {
+    to_uppercase(NULL);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_lowercase_string_null(void **state) {
+    to_lowercase(NULL);
+    assert_int_equal(errno, EINVAL);
 }
 // ================================================================================
 // ================================================================================

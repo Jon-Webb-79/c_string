@@ -487,6 +487,54 @@ bool replace_string_substr(string_t* string, const string_t* pattern, const stri
 #define replace_substr(string, pattern, replace_string, min_ptr, max_ptr) _Generic((pattern), \
     char*: replace_lit_substr, \
     string_t*: replace_string_substr) (string, pattern, replace_string, min_ptr, max_ptr)
+// ================================================================================
+// ================================================================================ 
+
+/**
+ * @func to_upper_char
+ * @brief Transforms a char value to its uppercase form 
+ *
+ * Sets the value of errno to EINVAL if val points to a NULL value
+ *
+ * @param val A pointer to he char value to be transformed to its uppercase form
+ */
+void to_upper_char(char* val);
+// --------------------------------------------------------------------------------
+
+/**
+ * @func to_lower_char
+ * @brief Transforms a char value to its lowercase form 
+ *
+ * Sets the value of errno to EINVAL if val points to a NULL value
+ *
+ * @param val A pointer to he char value to be transformed to its lowercase form
+ */
+void to_lower_char(char* val);
+// --------------------------------------------------------------------------------
+
+/**
+ * @func to_uppercase
+ * @brief Transforms all values in a string to uppercase
+ *
+ * Sets the value of errno to EINVAL if val points to a NULL value or a null value 
+ * of val->str
+ *
+ * @param val A pointer to a string_t data type
+ */
+void to_uppercase(string_t* val);
+// --------------------------------------------------------------------------------
+
+/**
+ * @func to_lowercase
+ * @brief Transforms all values in a string to lowercase
+ *
+ * Sets the value of errno to EINVAL if val points to a NULL value or a null value 
+ * of val->str
+ *
+ * @param val A pointer to a string_t data type
+ */
+
+void to_lowercase(string_t* val);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

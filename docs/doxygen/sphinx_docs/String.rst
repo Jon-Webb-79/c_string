@@ -651,6 +651,63 @@ replace_substr
      Using literals: 'hi world hi there'
      Using string_t: 'hi world hi there'
 
+String Case Conversion
+~~~~~~~~~~~~~~~~~~~~~~
+
+to_uppercase
+^^^^^^^^^^^^
+.. c:function:: void to_uppercase(string_t* s)
+
+  Converts all lowercase letters in a ``string_t`` object to uppercase.
+  Non-alphabetic characters are left unchanged.
+
+  :param s: ``string_t`` object to convert
+  :raises: Sets errno to EINVAL if s is NULL or contains invalid data
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("Hello, World! 123");
+     printf("Before: %s\n", get_string(str));
+     
+     to_uppercase(str);
+     printf("After: %s\n", get_string(str));
+
+  Output::
+
+     Before: Hello, World! 123
+     After: HELLO, WORLD! 123
+
+to_lowercase
+^^^^^^^^^^^^
+.. c:function:: void to_lowercase(string_t* s)
+
+  Converts all uppercase letters in a ``string_t`` object to lowercase.
+  Non-alphabetic characters are left unchanged.
+
+  :param s: ``string_t`` object to convert
+  :raises: Sets errno to EINVAL if s is NULL or contains invalid data
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("Hello, WORLD! 123");
+     printf("Before: %s\n", get_string(str));
+     
+     to_lowercase(str);
+     printf("After: %s\n", get_string(str));
+
+  Output::
+
+     Before: Hello, WORLD! 123
+     After: hello, world! 123
+
+  Note:
+     These functions work only with ASCII characters. For Unicode characters,
+     a more comprehensive character handling library should be used.
+
 String Comparison Functions
 ---------------------------
 The functions and Macros in this section are used to compare to strings 
@@ -1231,3 +1288,72 @@ is_string_ptr
      The valid range includes all characters from the first character up to, but not
      including, the null terminator. A pointer equal to str->str + str->len (pointing
      to the null terminator) is considered out of bounds.
+
+Character Case Conversion
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The following two functions can be used to change the case of a ``char`` value.
+These functions can be useful when iterating through a string in cases 
+where selective portions of a string must be transformed to a different 
+case.
+
+to_upper_char
+^^^^^^^^^^^^^
+.. c:function:: void to_upper_char(char* val)
+
+  Converts a single character to uppercase if it is a lowercase letter.
+  Non-alphabetic characters are left unchanged.
+
+  :param val: Pointer to character to convert
+  :raises: Sets errno to EINVAL if val is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     char c = 'a';
+     printf("Before: %c\n", c);
+     to_upper_char(&c);
+     printf("After: %c\n", c);
+
+     char d = '5';  // Non-alphabetic character
+     to_upper_char(&d);
+     printf("Number remains: %c\n", d);
+
+  Output::
+
+     Before: a
+     After: A
+     Number remains: 5
+
+to_lower_char
+^^^^^^^^^^^^^
+.. c:function:: void to_lower_char(char* val)
+
+  Converts a single character to lowercase if it is an uppercase letter.
+  Non-alphabetic characters are left unchanged.
+
+  :param val: Pointer to character to convert
+  :raises: Sets errno to EINVAL if val is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     char c = 'A';
+     printf("Before: %c\n", c);
+     to_lower_char(&c);
+     printf("After: %c\n", c);
+
+     char d = '!';  // Non-alphabetic character
+     to_lower_char(&d);
+     printf("Symbol remains: %c\n", d);
+
+  Output::
+
+     Before: A
+     After: a
+     Symbol remains: !
+
+  Note:
+     These functions work only with ASCII characters. For Unicode characters,
+     a more comprehensive character handling library should be used.

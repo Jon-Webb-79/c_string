@@ -41,7 +41,9 @@ maintaining the performance characteristics expected in C programs.
 
 This project enapsulates its funcitonality into the ``c_string.h`` header file, 
 which is wrapped in the header guard ``#ifdef __cplusplus`` which allows it to be 
-compiled with C++ as well as C
+compiled with C++ as well as C.  The header file name ``c_string.h`` was choosen to 
+ensure it did not conflict with the ``cstring.h`` header file used in the 
+C++ language.
 
 .. toctree::
    :maxdepth: 2
