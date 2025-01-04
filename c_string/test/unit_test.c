@@ -133,6 +133,15 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_pop_token_null_input),
         cmocka_unit_test(test_pop_token_single_char),
         cmocka_unit_test(test_pop_token_consecutive_tokens),
+        cmocka_unit_test(test_token_count_single_delimiter),
+        cmocka_unit_test(test_token_count_multiple_delimiters),
+        cmocka_unit_test(test_token_count_consecutive_delimiters),
+        cmocka_unit_test(test_token_count_leading_trailing_delimiters),
+        cmocka_unit_test(test_token_count_single_token),
+        cmocka_unit_test(test_token_count_empty_string),
+        cmocka_unit_test(test_token_count_null_inputs),
+        cmocka_unit_test(test_token_count_only_delimiters),
+        cmocka_unit_test(test_token_count_mixed_delimiters),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

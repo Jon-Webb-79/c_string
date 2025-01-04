@@ -1307,6 +1307,100 @@ void test_pop_token_consecutive_tokens(void **state) {
    free_string(result);
    free_string(result2);
 }
+// -------------------------------------------------------------------------------- 
+
+void test_token_count_single_delimiter(void **state) {
+   string_t* str = init_string("hello world there");
+   size_t count = token_count(str, " ");
+   
+   assert_int_equal(count, 3);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_multiple_delimiters(void **state) {
+   string_t* str = init_string("hello,world;there.test");
+   size_t count = token_count(str, ",.;");
+   
+   assert_int_equal(count, 4);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_consecutive_delimiters(void **state) {
+   string_t* str = init_string("hello   world  there");
+   size_t count = token_count(str, " ");
+   assert_int_equal(count, 3);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_leading_trailing_delimiters(void **state) {
+   string_t* str = init_string("  hello world there  ");
+   size_t count = token_count(str, " ");
+   
+   assert_int_equal(count, 3);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_single_token(void **state) {
+   string_t* str = init_string("hello");
+   size_t count = token_count(str, " ");
+   
+   assert_int_equal(count, 1);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_empty_string(void **state) {
+   string_t* str = init_string("");
+   size_t count = token_count(str, " ");
+   
+   assert_int_equal(count, 0);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_null_inputs(void **state) {
+   string_t* str = init_string("hello world");
+   
+   size_t count = token_count(NULL, " ");
+   assert_int_equal(count, 0);
+   assert_int_equal(errno, EINVAL);
+   
+   count = token_count(str, NULL);
+   assert_int_equal(count, 0);
+   assert_int_equal(errno, EINVAL);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_only_delimiters(void **state) {
+   string_t* str = init_string("   ");
+   size_t count = token_count(str, " ");
+   
+   assert_int_equal(count, 0);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_token_count_mixed_delimiters(void **state) {
+   string_t* str = init_string("hello,world;;there,,,test");
+   size_t count = token_count(str, ",;");
+   
+   assert_int_equal(count, 4);
+   
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof

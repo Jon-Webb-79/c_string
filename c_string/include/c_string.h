@@ -84,6 +84,7 @@ void _free_string(string_t** str);
     #define STRING_GBC __attribute__((cleanup(_free_string)))
 #endif
 // --------------------------------------------------------------------------------
+
 /**
  * @function get_string
  * @brief Retrieves the C string stored in a string_t object.
@@ -533,11 +534,45 @@ void to_uppercase(string_t* val);
  *
  * @param val A pointer to a string_t data type
  */
-
 void to_lowercase(string_t* val);
 // --------------------------------------------------------------------------------
 
+/**
+* @function pop_string_token
+* @brief Splits a string at the rightmost occurrence of a token character.
+*
+* Returns the portion of the string after the token as a new string_t object and
+* modifies the original string to contain only the portion before the token.
+* The token character is removed from the original string.
+*
+* @param str_struct string_t object to split
+* @param token Character to use as splitting token
+* @return New string_t object containing portion after token, or NULL if token not found
+*         Sets errno to EINVAL if str_struct is NULL
+*/
 string_t* pop_string_token(string_t* str_struct, char token);
+// --------------------------------------------------------------------------------
+
+/**
+* @function token_count
+* @brief Counts the number of tokens in a string separated by specified delimiter(s).
+*
+* Consecutive delimiters are treated as a single delimiter. Leading and trailing
+* delimiters are ignored.
+*
+* @param str string_t object to analyze
+* @param delim String containing delimiter character(s)
+* @return Number of tokens found, or 0 if str is empty or on error
+*         Sets errno to EINVAL if str or delim is NULL
+*
+* Example:
+*     string_t* str = init_string("hello world there");
+*     size_t count = token_count(str, " ");  // Returns 3
+*
+*     string_t* str2 = init_string("one,two;three");
+*     size_t count2 = token_count(str2, ",;");  // Returns 3
+*/
+size_t token_count(const string_t* str, const char* delim);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

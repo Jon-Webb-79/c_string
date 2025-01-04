@@ -880,7 +880,7 @@ copy_string
 
 first_char_occurance
 ~~~~~~~~~~~~~~~~~~~~
-.. c:function:: char* first_char_occurance(string_t* str, char value)
+.. c:function:: inline char* first_char_occurance(string_t* str, char value)
 
   Finds the first occurrence of a character in a ``string_t`` object.
   Similar to ``strchr()`` from the C standard library.
@@ -918,7 +918,7 @@ first_char_occurance
 
 last_char_occurance
 ~~~~~~~~~~~~~~~~~~~
-.. c:function:: char* last_char_occurance(string_t* str, char value)
+.. c:function:: inline char* last_char_occurance(string_t* str, char value)
 
   Finds the last occurrence of a character in a ``string_t`` object.
   Similar to ``strrchr()`` from the C standard library.
@@ -1284,10 +1284,7 @@ is_string_ptr
      Character at pointer: ' '
      Pointer is outside string bounds
 
-  Note:
-     The valid range includes all characters from the first character up to, but not
-     including, the null terminator. A pointer equal to str->str + str->len (pointing
-     to the null terminator) is considered out of bounds.
+.. note:: The valid range includes all characters from the first character up to, but not including, the null terminator. A pointer equal to str->str + str->len (pointing to the null terminator) is considered out of bounds.
 
 Character Case Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1354,9 +1351,7 @@ to_lower_char
      After: a
      Symbol remains: !
 
-  Note:
-     These functions work only with ASCII characters. For Unicode characters,
-     a more comprehensive character handling library should be used.
+.. note:: These functions work only with ASCII characters. For Unicode characters, a more comprehensive character handling library should be used.
 
 String Token Operations
 -----------------------
@@ -1411,6 +1406,42 @@ pop_string_token
      Left part: hello
      Popped part: world
 
-  Note:
-     The original string is modified by this function. If the token is not found,
-     the original string remains unchanged and NULL is returned.
+.. note:: The original string is modified by this function. If the token is not found, the original string remains unchanged and NULL is returned.
+
+token_count
+~~~~~~~~~~~
+.. c:function:: size_t token_count(const string_t* str, const char* delim)
+
+  Counts the number of tokens in a ``string_t`` object based on specified delimiter characters.
+  Consecutive delimiters are treated as a single delimiter, and leading/trailing
+  delimiters are ignored.
+
+  :param str: ``string_t`` object to analyze
+  :param delim: String containing one or more delimiter characters
+  :returns: Number of tokens found, or 0 if string is empty or on error
+  :raises: Sets errno to EINVAL if str or delim is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello   world  there");
+     size_t count = token_count(str, " ");
+     printf("Token count: %zu\n", count);
+
+     string_t* str2 STRING_GBC = init_string("one,two;three,four");
+     size_t count2 = token_count(str2, ",;");  // Multiple delimiters
+     printf("Token count: %zu\n", count2);
+     
+     string_t* str3 STRING_GBC = init_string("   extra spaces   ");
+     size_t count3 = token_count(str3, " ");
+     printf("Token count: %zu\n", count3);
+
+  Output::
+
+     Token count: 3
+     Token count: 4
+     Token count: 1
+
+.. note:: The function treats any character in the delim string as a delimiter. For example, if delim is ".,", both period and comma will be treated as delimiters. 
+

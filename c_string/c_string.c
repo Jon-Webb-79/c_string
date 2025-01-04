@@ -492,8 +492,7 @@ char* first_char(string_t* str) {
         errno = EINVAL;
         return NULL;
     }
-    char* begin = str->str;
-    return begin;
+    return str->str;
 }
 // --------------------------------------------------------------------------------
 
@@ -502,8 +501,7 @@ char* last_char(string_t* str) {
         errno = EINVAL;
         return NULL;
     }
-    char* begin = str->str + str->len - 1;
-    return begin;
+    return str->str + str->len - 1;
 }
 // --------------------------------------------------------------------------------
 
@@ -839,6 +837,103 @@ string_t* pop_string_token(string_t* str_struct, char token) {
     }
     return NULL;
 }
+// --------------------------------------------------------------------------------
+
+size_t token_count(const string_t* str, const char* delim) {
+    if (!str || !str->str || !delim) {
+        errno = EINVAL;
+        return 0;
+    }
+    
+    if (str->len == 0 || strlen(delim) == 0) {
+        return 0;
+    }
+
+    size_t count = 0;
+    const char* ptr = str->str;
+    bool in_token = false;
+
+    while (*ptr) {
+        bool is_delim = false;
+        // Check if current character is a delimiter
+        for (size_t i = 0; delim[i] != '\0'; i++) {
+            if (*ptr == delim[i]) {
+                is_delim = true;
+                break;
+            }
+        }
+
+        if (!is_delim && !in_token) {
+            // Start of new token
+            count++;
+            in_token = true;
+        }
+        else if (is_delim) {
+            // End of current token
+            in_token = false;
+        }
+        ptr++;
+    }
+
+    return count;
+}
+
+// size_t token_count(const string_t* str, const char* delim) {
+//     if (!str || !str->str || !delim) {
+//         errno = EINVAL;
+//         return 0;
+//     }
+//     
+//     if (str->len == 0 || strlen(delim) == 0) {
+//         return 0;
+//     }
+//
+//     size_t count = 1;  // Start with 1 for the first token
+//     const char* ptr = str->str;
+//     const char* end = str->str + str->len;
+//
+//     // Handle case where string starts with delimiter(s)
+//     while (ptr < end) {
+//         bool is_delim = false;
+//         for (size_t i = 0; delim[i] != '\0'; i++) {
+//             if (*ptr == delim[i]) {
+//                 is_delim = true;
+//                 break;
+//             }
+//         }
+//         if (!is_delim) break;
+//         ptr++;
+//     }
+//
+//     // Count tokens
+//     while (ptr < end) {
+//         // Check if current character is a delimiter
+//         for (size_t i = 0; delim[i] != '\0'; i++) {
+//             if (*ptr == delim[i]) {
+//                 // Look ahead to see if next non-delimiter char exists
+//                 const char* next = ptr + 1;
+//                 while (next < end) {
+//                     bool is_delim = false;
+//                     for (size_t j = 0; delim[j] != '\0'; j++) {
+//                         if (*next == delim[j]) {
+//                             is_delim = true;
+//                             break;
+//                         }
+//                     }
+//                     if (!is_delim) {
+//                         count++;
+//                         break;
+//                     }
+//                     next++;
+//                 }
+//                 break;
+//             }
+//         }
+//         ptr++;
+//     }
+//
+//     return count;
+// }
 // ================================================================================
 // ================================================================================
 // eof
