@@ -142,6 +142,13 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_token_count_null_inputs),
         cmocka_unit_test(test_token_count_only_delimiters),
         cmocka_unit_test(test_token_count_mixed_delimiters),
+        cmocka_unit_test(test_get_char_nominal),
+        cmocka_unit_test(test_get_char_out_of_bounds),
+        cmocka_unit_test(test_get_char_null),
+        cmocka_unit_test(test_replace_char_nominal),
+        cmocka_unit_test(test_replace_char_out_of_bounds),
+        cmocka_unit_test(test_replace_char_null),
+        cmocka_unit_test(test_replace_char_special_chars),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

@@ -573,6 +573,34 @@ string_t* pop_string_token(string_t* str_struct, char token);
 *     size_t count2 = token_count(str2, ",;");  // Returns 3
 */
 size_t token_count(const string_t* str, const char* delim);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function get_char 
+ * @brief Returns a chare to the user from a string_t data structure.
+ *
+ * @param str A string_t data type 
+ * @param index The index from within the string_t data type from which a char will 
+ *              be retrieved 
+ * @return A char value.  Sets errno to EINVAL if str or str->str is NULL, or
+ *         ERANGE if index is out of range
+ */
+char get_char(string_t* str, size_t index);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function replace_char 
+ * @brief Replaces an existing char value in a string_t data type with another 
+ *
+ * Sets errno to EINVAL if str or str->str is NULL or ERANGE if index is out
+ * of range
+ *
+ * @param str A string_t data type 
+ * @param index The index within str where a char value will be replaced 
+ * @param value The char value to replace with 
+ *
+ */
+void replace_char(string_t* str, size_t index, char value);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

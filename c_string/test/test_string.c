@@ -1401,6 +1401,87 @@ void test_token_count_mixed_delimiters(void **state) {
    
    free_string(str);
 }
+// --------------------------------------------------------------------------------
+
+/* Tests for get_char */
+void test_get_char_nominal(void **state) {
+   string_t* str = init_string("hello");
+   
+   assert_int_equal(get_char(str, 0), 'h');
+   assert_int_equal(get_char(str, 4), 'o');
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_get_char_out_of_bounds(void **state) {
+   string_t* str = init_string("hello");
+   
+   char result = get_char(str, 5);  // Index equal to length
+   assert_int_equal(result, 0);
+   assert_int_equal(errno, ERANGE);
+   
+   result = get_char(str, 10);  // Index way beyond length
+   assert_int_equal(result, 0);
+   assert_int_equal(errno, ERANGE);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_get_char_null(void **state) {
+   char result = get_char(NULL, 0);
+   assert_int_equal(result, 0);
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_replace_char_nominal(void **state) {
+   string_t* str = init_string("hello");
+   
+   replace_char(str, 0, 'H');
+   assert_string_equal(get_string(str), "Hello");
+   
+   replace_char(str, 4, 'O');
+   assert_string_equal(get_string(str), "HellO");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_replace_char_out_of_bounds(void **state) {
+   string_t* str = init_string("hello");
+   
+   // Should not modify string when index is out of bounds
+   replace_char(str, 5, 'x');
+   assert_int_equal(errno, ERANGE);
+   assert_string_equal(get_string(str), "hello");
+   
+   replace_char(str, 10, 'x');
+   assert_int_equal(errno, ERANGE);
+   assert_string_equal(get_string(str), "hello");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_replace_char_null(void **state) {
+   replace_char(NULL, 0, 'x');
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_replace_char_special_chars(void **state) {
+   string_t* str = init_string("test");
+   
+   replace_char(str, 1, '\n');
+   assert_int_equal(get_char(str, 1), '\n');
+   
+   replace_char(str, 2, '\t');
+   assert_int_equal(get_char(str, 2), '\t');
+   
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof

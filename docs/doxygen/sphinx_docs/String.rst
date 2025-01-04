@@ -708,6 +708,36 @@ to_lowercase
      These functions work only with ASCII characters. For Unicode characters,
      a more comprehensive character handling library should be used.
 
+replace_char
+~~~~~~~~~~~~
+.. c:function:: void replace_char(string_t* str, size_t index, char value)
+
+  Replaces the character at a specified index in a ``string_t`` object.
+
+  :param str: ``string_t`` object to modify
+  :param index: Zero-based index of the character to replace
+  :param value: New character value
+  :raises: Sets errno to EINVAL if str is NULL, ERANGE if index is out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello");
+     
+     replace_char(str, 0, 'H');
+     printf("After capitalizing first letter: %s\n", get_string(str));
+     
+     replace_char(str, 4, '!');
+     printf("After replacing last letter: %s\n", get_string(str));
+     
+     free_string(str);
+
+  Output::
+
+     After capitalizing first letter: Hello
+     After replacing last letter: Hell!
+
 String Comparison Functions
 ---------------------------
 The functions and Macros in this section are used to compare to strings 
@@ -837,6 +867,36 @@ String Utility Functions
 ------------------------
 The functions and Macros in this section offer general utility functions 
 for characterizing data within the ``size_t`` data type.
+
+get_char
+~~~~~~~~
+.. c:function:: char get_char(string_t* str, size_t index)
+
+  Retrieves the character at a specified index in a ``string_t`` object.
+
+  :param str: ``string_t`` object to access
+  :param index: Zero-based index of the character to retrieve
+  :returns: Character at specified index, or 0 on error
+  :raises: Sets errno to EINVAL if str is NULL, ERANGE if index is out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("Hello");
+     
+     char first = get_char(str, 0);
+     printf("First character: %c\n", first);
+     
+     char last = get_char(str, 4);
+     printf("Last character: %c\n", last);
+     
+     free_string(str);
+
+  Output::
+
+     First character: H
+     Last character: o
 
 copy_string
 ~~~~~~~~~~~
@@ -1414,7 +1474,8 @@ token_count
 
   Counts the number of tokens in a ``string_t`` object based on specified delimiter characters.
   Consecutive delimiters are treated as a single delimiter, and leading/trailing
-  delimiters are ignored.
+  delimiters are ignored. A common use for this function would be to use white 
+  spaces as a method to count the number of words in a text string.
 
   :param str: ``string_t`` object to analyze
   :param delim: String containing one or more delimiter characters

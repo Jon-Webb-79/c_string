@@ -877,63 +877,32 @@ size_t token_count(const string_t* str, const char* delim) {
 
     return count;
 }
+// --------------------------------------------------------------------------------
 
-// size_t token_count(const string_t* str, const char* delim) {
-//     if (!str || !str->str || !delim) {
-//         errno = EINVAL;
-//         return 0;
-//     }
-//     
-//     if (str->len == 0 || strlen(delim) == 0) {
-//         return 0;
-//     }
-//
-//     size_t count = 1;  // Start with 1 for the first token
-//     const char* ptr = str->str;
-//     const char* end = str->str + str->len;
-//
-//     // Handle case where string starts with delimiter(s)
-//     while (ptr < end) {
-//         bool is_delim = false;
-//         for (size_t i = 0; delim[i] != '\0'; i++) {
-//             if (*ptr == delim[i]) {
-//                 is_delim = true;
-//                 break;
-//             }
-//         }
-//         if (!is_delim) break;
-//         ptr++;
-//     }
-//
-//     // Count tokens
-//     while (ptr < end) {
-//         // Check if current character is a delimiter
-//         for (size_t i = 0; delim[i] != '\0'; i++) {
-//             if (*ptr == delim[i]) {
-//                 // Look ahead to see if next non-delimiter char exists
-//                 const char* next = ptr + 1;
-//                 while (next < end) {
-//                     bool is_delim = false;
-//                     for (size_t j = 0; delim[j] != '\0'; j++) {
-//                         if (*next == delim[j]) {
-//                             is_delim = true;
-//                             break;
-//                         }
-//                     }
-//                     if (!is_delim) {
-//                         count++;
-//                         break;
-//                     }
-//                     next++;
-//                 }
-//                 break;
-//             }
-//         }
-//         ptr++;
-//     }
-//
-//     return count;
-// }
+char get_char(string_t* str, size_t index) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return 0;
+    }
+    if (index > str->len - 1) {
+        errno = ERANGE;
+        return 0;
+    }
+    return str->str[index];
+}
+// --------------------------------------------------------------------------------
+
+void replace_char(string_t* str, size_t index, char value) {
+    if (!str || !str->str) {
+        errno = EINVAL;
+        return;
+    }
+    if (index > str->len - 1) {
+        errno = ERANGE;
+        return;
+    }
+    str->str[index] = value;
+}
 // ================================================================================
 // ================================================================================
 // eof
