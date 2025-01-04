@@ -31,7 +31,7 @@ struct string_t {
 // ================================================================================ 
 // PRIVATE FUNCTIONS
 
-static char* _last_literal_between_ptrs(char* string, char* min_ptr, char* max_ptr) {
+static char* _last_literal_between_ptrs(const char* string, char* min_ptr, char* max_ptr) {
     if (!string) {
         fprintf(stderr, "ERROR: Null string provided for last_literal_between_ptrs\n");
         return NULL;
@@ -520,7 +520,7 @@ bool is_string_ptr(string_t* str, char* ptr) {
 }
 // -------------------------------------------------------------------------------- 
 
-bool drop_lit_substr(string_t* string, char* substring, char* min_ptr, char* max_ptr) {
+bool drop_lit_substr(string_t* string, const char* substring, char* min_ptr, char* max_ptr) {
     if (!string || !substring || !string->str) {
         errno = EINVAL;
         return false;
@@ -557,7 +557,7 @@ bool drop_lit_substr(string_t* string, char* substring, char* min_ptr, char* max
 }
 // --------------------------------------------------------------------------------
 
-bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr, char* max_ptr) {
+bool drop_string_substr(string_t* string, const string_t* substring, char* min_ptr, char* max_ptr) {
     if (!string || !substring || !string->str || !substring->str) {
         errno = EINVAL;
         return false;
@@ -590,6 +590,172 @@ bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr, ch
         max_ptr -= drop_len;
         *(string->str + string->len) = '\0';
     }
+    return true;
+}
+// -------------------------------------------------------------------------------- 
+
+bool replace_lit_substr(string_t* string, const char* pattern, const char* replace_string,
+                        char* min_ptr, char* max_ptr) {
+    if (!string || !string->str || !pattern ||  !replace_string || 
+        !min_ptr || !max_ptr) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    if (!is_string_ptr(string, min_ptr) || !is_string_ptr(string, max_ptr)) {
+        errno = ERANGE;
+        return false;
+    } 
+    
+    // Calculate the delta between the pattern and replacement lengths.
+    int delta = strlen(replace_string) - strlen(pattern);
+
+    size_t pattern_len = strlen(pattern);
+    size_t replace_len = strlen(replace_string);
+
+    // Pre-allocate if we need more space
+    size_t count = 0;
+    if (delta > 0) {
+        char* search_ptr = min_ptr;
+        char* end_ptr = max_ptr;
+        while ((search_ptr = _last_literal_between_ptrs(pattern, min_ptr, end_ptr))) {
+            count++;
+            if (search_ptr <= min_ptr) break;  // Found match at start, we're done
+            end_ptr = search_ptr - 1;
+        } 
+        size_t new_size = string->len + (delta * count) + 1;
+        if (new_size > string->alloc) {
+            size_t min_pos = min_ptr - string->str;
+            size_t max_pos = max_ptr - string->str;
+            
+            char* new_data = realloc(string->str, new_size);
+            if (!new_data) {
+                errno = ENOMEM;
+                fprintf(stderr, "ERROR: Realloc failed in replace_lit_substring\n");
+                return false;
+            }
+            string->str = new_data;
+            string->alloc = new_size;
+            min_ptr = string->str + min_pos;
+            max_ptr = string->str + max_pos;
+        }
+    }
+    
+    char* ptr = _last_literal_between_ptrs(pattern, min_ptr, max_ptr);
+    while (ptr) {
+        // If the replacement string is the same length, copy it over.
+        if (delta == 0) {
+            memcpy(ptr, replace_string, replace_len);
+            max_ptr = ptr;
+        }
+
+        // - If replacement string is smaller, copy string, move memory to the 
+        //   left, and update length
+        else if (delta < 0) {
+            memcpy(ptr, replace_string, replace_len);
+
+            size_t tail_length = string->str + string->len - (ptr + pattern_len);
+            memmove(ptr + replace_len, ptr + pattern_len, tail_length);
+
+            string->len += delta; // delta is negative, so it reduces string->len
+
+            string->str[string->len] = '\0';
+
+            max_ptr -= pattern_len - replace_len;
+        }
+        else {
+            memmove(ptr + replace_len,
+                    ptr + pattern_len,
+                    string->len - (ptr - string->str) - pattern_len);
+            memcpy(ptr, replace_string, replace_len);
+            string->len += delta;
+            string->str[string->len] = '\0';
+            ptr += delta;
+            max_ptr = ptr;
+        }        
+         // Find the next pattern instance within the updated pointer bounds.
+         if (min_ptr < max_ptr)
+            ptr = _last_literal_between_ptrs(pattern, min_ptr, max_ptr);
+         else
+            ptr = NULL;
+    }
+
+    return true;
+}
+// --------------------------------------------------------------------------------
+
+bool replace_string_substr(string_t* string, const string_t* pattern, const string_t* replace_string,
+                           char* min_ptr, char* max_ptr) {
+    if (!string || !string->str || !pattern || !pattern->str || 
+        !replace_string || !replace_string->str || !min_ptr || !max_ptr) {
+        errno = EINVAL;
+        return false;
+    }
+  
+    if (!is_string_ptr(string, min_ptr) || !is_string_ptr(string, max_ptr)) {
+        errno = ERANGE;
+        return false;
+    } 
+   
+    // Calculate the delta between the pattern and replacement lengths.
+    int delta = replace_string->len - pattern->len;
+   
+    // Count occurrences within specified range if we need to grow the string
+    size_t count = 0;
+    if (delta > 0) {
+        char* search_ptr = min_ptr;
+        char* end_ptr = max_ptr;
+        while ((search_ptr = _last_literal_between_ptrs(pattern->str, min_ptr, end_ptr))) {
+            count++;
+            if (search_ptr <= min_ptr) break;  // Found match at start, we're done
+            end_ptr = search_ptr - 1;
+        }
+       
+        // Pre-allocate all needed memory
+        size_t new_size = string->len + (delta * count) + 1;
+        if (new_size > string->alloc) {
+            size_t min_pos = min_ptr - string->str;
+            size_t max_pos = max_ptr - string->str;
+           
+            char* new_data = realloc(string->str, new_size);
+            if (!new_data) {
+                errno = ENOMEM;
+                fprintf(stderr, "ERROR: Realloc failed in replace_string_substring\n");
+                return false;
+            }
+            string->str = new_data;
+            string->alloc = new_size;
+            min_ptr = string->str + min_pos;
+            max_ptr = string->str + max_pos;
+        }
+    }
+   
+    char* ptr = _last_literal_between_ptrs(pattern->str, min_ptr, max_ptr);
+    while (ptr) {
+        if (delta == 0) {
+            memcpy(ptr, replace_string->str, replace_string->len);
+        }
+        else if (delta < 0) {
+            memcpy(ptr, replace_string->str, replace_string->len);
+            memmove(ptr + replace_string->len, 
+                    ptr + pattern->len,
+                    string->len - (ptr - string->str) - pattern->len + 1);
+            string->len += delta;
+        }
+        else {  // delta > 0
+            memmove(ptr + replace_string->len,
+                    ptr + pattern->len,
+                    string->len - (ptr - string->str) - pattern->len + 1);
+            memcpy(ptr, replace_string->str, replace_string->len);
+            string->len += delta;
+        }
+       
+        max_ptr = ptr - 1;
+        if (min_ptr >= max_ptr) break;
+        ptr = _last_literal_between_ptrs(pattern->str, min_ptr, max_ptr);
+    }
+   
+    string->str[string->len] = '\0';
     return true;
 }
 // ================================================================================

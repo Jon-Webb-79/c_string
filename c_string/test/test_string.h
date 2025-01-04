@@ -280,6 +280,33 @@ void test_drop_substring_not_found(void **state);
 // --------------------------------------------------------------------------------
 
 void test_drop_substring_invalid_range(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_literal_nominal(void **state);
+// --------------------------------------------------------------------------------
+
+void test_replace_substr_literal_shorter_replacement(void **state);
+// --------------------------------------------------------------------------------
+
+void test_replace_substr_literal_longer_replacement(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_literal_partial_range(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_string_nominal(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_string_shorter_replacement(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_string_longer_replacement(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_string_partial_range(void **state);
+// -------------------------------------------------------------------------------- 
+
+void test_replace_substr_invalid_range(void **state);
 // ================================================================================
 // ================================================================================ 
 #endif /* test_string_H */

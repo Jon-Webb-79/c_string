@@ -414,7 +414,7 @@ to form a contiguous char array within the ``string_t`` data type.
 
 drop_lit_substr
 ^^^^^^^^^^^^^^^
-.. c:function:: bool drop_lit_substr(string_t* string, char* substring, char* min_ptr, char* max_ptr)
+.. c:function:: bool drop_lit_substr(string_t* string, const char* substring, char* min_ptr, char* max_ptr)
 
   Removes all occurrences of a C string literal substring between two pointers in a ``string_t`` object.
   Searches from end to beginning and preserves existing spaces between words. 
@@ -451,7 +451,7 @@ drop_lit_substr
 
 drop_string_substr
 ^^^^^^^^^^^^^^^^^^
-.. c:function:: bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr, char* max_ptr)
+.. c:function:: bool drop_string_substr(string_t* string, const string_t* substring, char* min_ptr, char* max_ptr)
 
   Removes all occurrences of a ``string_t`` substring between two pointers in another string_t object.
   Searches from end to beginning and preserves existing spaces between words.
@@ -528,6 +528,128 @@ drop_substr
      
      Using string_t - Before: 'test hello test hello test'
      After: 'test test test'
+
+String Replacement Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions described in this section can be used to replace sub string 
+ocurrences over a user defined range with a new sub-string.
+
+.. _replace-lit-substring-func:
+
+replace_lit_substr
+^^^^^^^^^^^^^^^^^^
+.. c:function:: bool replace_lit_substr(string_t* string, const char* pattern, const char* replace_string, char* min_ptr, char* max_ptr)
+
+  Replaces all occurrences of a C string literal pattern with a replacement string between
+  two specified pointers in a ``string_t`` object. Searches from right to left.
+  Developers may also choose to implement the :ref:`replace_substring <replace-substring-macro>`
+  Macro in place of this function.
+
+  :param string: ``string_t`` object to modify
+  :param pattern: C string literal to search for and replace
+  :param replace_string: C string literal to replace pattern with
+  :param min_ptr: Pointer to start of search range
+  :param max_ptr: Pointer to end of search range
+  :returns: true if successful (including no matches found), false on error
+  :raises: Sets errno to EINVAL if inputs are NULL, ERANGE if pointers out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello world hello there hello");
+     char* start = first_char(str);
+     char* end = last_char(str);
+     
+     // Replace all "hello" with "hi" in the entire string
+     if (replace_lit_substr(str, "hello", "hi", start, end)) {
+         printf("After replacement: '%s'\n", get_string(str));
+     }
+     
+  Output::
+
+     After replacement: 'hi world hi there hi'
+
+.. _replace-string-substring-func:
+
+replace_string_substr
+^^^^^^^^^^^^^^^^^^^^^
+.. c:function:: bool replace_string_substr(string_t* string, const string_t* pattern, const string_t* replace_string, char* min_ptr, char* max_ptr)
+
+  Replaces all occurrences of a ``string_t`` pattern with another ``string_t`` between
+  two specified pointers in a ``string_t object``. Searches from right to left.
+  Developers may also choose to implement the :ref:`replace_substring <replace-substring-macro>`
+  Macro in place of this function.
+
+  :param string: ``string_t`` object to modify
+  :param pattern: ``string_t`` object containing pattern to search for
+  :param replace_string: ``string_t`` object containing replacement string
+  :param min_ptr: Pointer to start of search range
+  :param max_ptr: Pointer to end of search range
+  :returns: true if successful (including no matches found), false on error
+  :raises: Sets errno to EINVAL if inputs are NULL, ERANGE if pointers out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str STRING_GBC = init_string("hello world hello there");
+     string_t* pattern STRING_GBC = init_string("hello");
+     string_t* replacement STRING_GBC = init_string("hi");
+     
+     char* start = first_char(str) + 6;  // Start after first "hello"
+     char* end = last_char(str);
+     
+     // Replace "hello" with "hi" only in specified range
+     if (replace_string_substr(str, pattern, replacement, start, end)) {
+         printf("After partial replacement: '%s'\n", get_string(str));
+     }
+     
+  Output::
+
+     After partial replacement: 'hello world hi there'
+
+.. _replace-substring-macro:
+
+replace_substr
+^^^^^^^^^^^^^^
+.. c:macro:: replace_substr(string, pattern, replace_string, min_ptr, max_ptr)
+
+  A generic macro that selects the appropriate replacement function based on the type
+  of the pattern argument. Provides a unified interface for string replacement operations.
+  This macro wraps the :ref:`replace_string_substr() <replace-string-substring-func>`
+  and :ref:`replace_lit_substr() <replace-lit-substring-func>` functions
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello world hello there");
+     string_t* pat = init_string("hello");
+     string_t* rep = init_string("hi");
+     char* start = first_char(str);
+     char* end = last_char(str);
+     
+     // Using with literal strings
+     replace_substr(str, "hello", "hi", start, end);
+     printf("Using literals: '%s'\n", get_string(str));
+     
+     // Reset string
+     free_string(str);
+     str = init_string("hello world hello there");
+     
+     // Using with string_t objects
+     replace_substr(str, pat, rep, start, end);
+     printf("Using string_t: '%s'\n", get_string(str));
+     
+     free_string(str);
+     free_string(pat);
+     free_string(rep);
+
+  Output::
+
+     Using literals: 'hi world hi there'
+     Using string_t: 'hi world hi there'
 
 String Comparison Functions
 ---------------------------

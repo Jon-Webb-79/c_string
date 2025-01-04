@@ -390,7 +390,7 @@ bool is_string_ptr(string_t* str, char* ptr);
 *         Sets errno to EINVAL if inputs are NULL or range invalid
 *         Sets errno to ERANGE if pointers are out of bounds
 */
-bool drop_lit_substr(string_t* string, char* substring, char* min_ptr,
+bool drop_lit_substr(string_t* string, const char* substring, char* min_ptr,
                      char* max_ptr);
 // -------------------------------------------------------------------------------- 
 
@@ -409,7 +409,7 @@ bool drop_lit_substr(string_t* string, char* substring, char* min_ptr,
 *         Sets errno to EINVAL if inputs are NULL or range invalid
 *         Sets errno to ERANGE if pointers are out of bounds
 */
-bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr,
+bool drop_string_substr(string_t* string, const string_t* substring, char* min_ptr,
                         char* max_ptr);
 // -------------------------------------------------------------------------------- 
 
@@ -427,6 +427,66 @@ bool drop_string_substr(string_t* string, string_t* substring, char* min_ptr,
 #define drop_substr(string, substr, min_ptr, max_ptr) _Generic((substr), \
     char*: drop_lit_substr, \
     string_t*: drop_string_substr) (string, substr, min_ptr, max_ptr)
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function replace_lit_substring
+* @brief Replaces all occurrences of a C string literal pattern with a replacement string
+*        between two specified pointers in a string_t object.
+*
+* If the replacement string is longer than the pattern, memory will be reallocated as needed.
+* If shorter, the string will be compacted. The function maintains proper null termination.
+*
+* @param string string_t object to modify
+* @param pattern const C string literal to search for and replace
+* @param replace_string const C string literal to replace pattern with
+* @param min_ptr Pointer to start of search range within string
+* @param max_ptr Pointer to end of search range within string
+* @return bool true if successful (including when no matches found), false on error
+*         Sets errno to EINVAL if inputs are NULL
+*         Sets errno to ERANGE if pointers are out of bounds
+*         Sets errno to ENOMEM if memory reallocation fails
+*/
+bool replace_lit_substr(string_t* string, const char* pattern, const char* replace_string,
+                        char* min_ptr, char* max_ptr);
+// --------------------------------------------------------------------------------
+
+/**
+* @function replace_string_substring
+* @brief Replaces all occurrences of a string_t pattern with another string_t
+*        between two specified pointers in a string_t object.
+*
+* If the replacement string is longer than the pattern, memory will be reallocated as needed.
+* If shorter, the string will be compacted. The function maintains proper null termination.
+*
+* @param string string_t object to modify
+* @param pattern const string_t object containing pattern to search for and replace
+* @param replace_string const string_t object containing string to replace pattern with
+* @param min_ptr Pointer to start of search range within string
+* @param max_ptr Pointer to end of search range within string
+* @return bool true if successful (including when no matches found), false on error
+*         Sets errno to EINVAL if inputs are NULL
+*         Sets errno to ERANGE if pointers are out of bounds
+*         Sets errno to ENOMEM if memory reallocation fails
+*/
+bool replace_string_substr(string_t* string, const string_t* pattern, const string_t* replace_string,
+                           char* min_ptr, char* max_ptr);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @macro replace_substr
+* @brief Generic macro that selects appropriate substring replacement function based on type.
+*
+* If the pattern is char*, calls replace_lit_substring.
+* If the pattern is string_t*, calls replace_string_substring.
+*
+* Example usage:
+*     replace_substr(str, "old", "new", start, end)          // Uses literal version
+*     replace_substr(str1, pattern, replacement, start, end)  // Uses string_t version
+*/
+#define replace_substr(string, pattern, replace_string, min_ptr, max_ptr) _Generic((pattern), \
+    char*: replace_lit_substr, \
+    string_t*: replace_string_substr) (string, pattern, replace_string, min_ptr, max_ptr)
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus
