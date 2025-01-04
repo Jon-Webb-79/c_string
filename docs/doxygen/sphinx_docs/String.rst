@@ -1357,3 +1357,60 @@ to_lower_char
   Note:
      These functions work only with ASCII characters. For Unicode characters,
      a more comprehensive character handling library should be used.
+
+String Token Operations
+-----------------------
+
+pop_string_token
+~~~~~~~~~~~~~~~~
+.. c:function:: string_t* pop_string_token(string_t* str_struct, char token)
+
+  Splits a string at the rightmost occurrence of a specified token character.
+  Returns the portion of the string after the token as a new ``string_t`` object,
+  and modifies the original string to contain only the portion before the token.
+
+  :param str_struct: ``string_t`` object to split
+  :param token: Character to use as the splitting token
+  :returns: New string_t object containing the portion after the token,
+           or NULL if token not found or on error
+  :raises: Sets errno to EINVAL if str_struct is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello,world,there");
+     printf("Original: %s\n", get_string(str));
+     
+     string_t* right = pop_string_token(str, ',');
+     if (right) {
+         printf("After first pop:\n");
+         printf("Left part: %s\n", get_string(str));
+         printf("Popped part: %s\n", get_string(right));
+         
+         // Pop another token
+         string_t* right2 = pop_string_token(str, ',');
+         if (right2) {
+             printf("\nAfter second pop:\n");
+             printf("Left part: %s\n", get_string(str));
+             printf("Popped part: %s\n", get_string(right2));
+             free_string(right2);
+         }
+         free_string(right);
+     }
+     free_string(str);
+
+  Output::
+
+     Original: hello,world,there
+     After first pop:
+     Left part: hello,world
+     Popped part: there
+
+     After second pop:
+     Left part: hello
+     Popped part: world
+
+  Note:
+     The original string is modified by this function. If the token is not found,
+     the original string remains unchanged and NULL is returned.

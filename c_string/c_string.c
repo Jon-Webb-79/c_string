@@ -812,6 +812,33 @@ void to_lowercase(string_t *s) {
         if (*i >= 'A' && *i <= 'Z') *i += 32;
     }
 }
+// --------------------------------------------------------------------------------
+
+string_t* pop_string_token(string_t* str_struct, char token) {
+    if (!str_struct || !str_struct->str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    if (str_struct->len == 0) {
+        return NULL;
+    }
+    for (int i = str_struct->len - 1; i >= 0; i--) {
+        if (str_struct->str[i] == token) {
+            // Handle case where token is last character
+            if (i == str_struct->len - 1) {
+                str_struct->str[i] = '\0';
+                str_struct->len = i;
+                return init_string("");
+            }
+            
+            string_t *one = init_string(str_struct->str + (i + 1));
+            str_struct->str[i] = '\0';
+            str_struct->len = i;
+            return one;
+        }
+    }
+    return NULL;
+}
 // ================================================================================
 // ================================================================================
 // eof

@@ -1198,6 +1198,115 @@ void test_lowercase_string_null(void **state) {
     to_lowercase(NULL);
     assert_int_equal(errno, EINVAL);
 }
+// --------------------------------------------------------------------------------
+
+void test_pop_token_nominal(void **state) {
+   string_t* str = init_string("hello,world");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_non_null(result);
+   assert_string_equal(get_string(str), "hello");
+   assert_string_equal(get_string(result), "world");
+   assert_int_equal(string_size(str), 5);
+   
+   free_string(str);
+   free_string(result);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_multiple_tokens(void **state) {
+   string_t* str = init_string("hello,world,there");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_non_null(result);
+   assert_string_equal(get_string(str), "hello,world");
+   assert_string_equal(get_string(result), "there");
+   
+   // Pop another token
+   string_t* result2 = pop_string_token(str, ',');
+   assert_non_null(result2);
+   assert_string_equal(get_string(str), "hello");
+   assert_string_equal(get_string(result2), "world");
+   
+   free_string(str);
+   free_string(result);
+   free_string(result2);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_at_end(void **state) {
+   string_t* str = init_string("hello,");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_non_null(result);
+   assert_string_equal(get_string(str), "hello");
+   assert_string_equal(get_string(result), "");
+   
+   free_string(str);
+   free_string(result);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_no_token(void **state) {
+   string_t* str = init_string("hello world");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_null(result);
+   assert_string_equal(get_string(str), "hello world");
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_empty_string(void **state) {
+   string_t* str = init_string("");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_null(result);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_null_input(void **state) {
+   string_t* result = pop_string_token(NULL, ',');
+   
+   assert_null(result);
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_single_char(void **state) {
+   string_t* str = init_string("a,b");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_non_null(result);
+   assert_string_equal(get_string(str), "a");
+   assert_string_equal(get_string(result), "b");
+   
+   free_string(str);
+   free_string(result);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_token_consecutive_tokens(void **state) {
+   string_t* str = init_string("hello,,world");
+   string_t* result = pop_string_token(str, ',');
+   
+   assert_non_null(result);
+   assert_string_equal(get_string(str), "hello,");
+   assert_string_equal(get_string(result), "world");
+   
+   // Pop the empty segment
+   string_t* result2 = pop_string_token(str, ',');
+   assert_non_null(result2);
+   assert_string_equal(get_string(str), "hello");
+   assert_string_equal(get_string(result2), "");
+   
+   free_string(str);
+   free_string(result);
+   free_string(result2);
+}
 // ================================================================================
 // ================================================================================
 // eof
