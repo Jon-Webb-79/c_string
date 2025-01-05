@@ -1145,6 +1145,56 @@ bool push_back_str_vector(string_v* vec, const char* value) {
 }
 // --------------------------------------------------------------------------------
 
+bool push_front_str_vector(string_v* vec, const char* value) {
+    if (!vec || !vec->data || !value) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    // Check if we need to resize
+    if (vec->len >= vec->alloc) {
+        size_t new_alloc = vec->alloc == 0 ? 1 : vec->alloc;
+        if (new_alloc < VEC_THRESHOLD) {
+            new_alloc *= 2;
+        } else {
+            new_alloc += VEC_FIXED_AMOUNT;
+        }
+       
+        string_t* new_data = realloc(vec->data, new_alloc * sizeof(string_t));
+        if (!new_data) {
+            errno = ENOMEM;
+            return false;
+        }
+       
+        memset(new_data + vec->alloc, 0, (new_alloc - vec->alloc) * sizeof(string_t));
+       
+        vec->data = new_data;
+        vec->alloc = new_alloc;
+    }
+
+    // Move existing elements right
+    memmove(vec->data + 1, vec->data, vec->len * sizeof(string_t));
+    
+    // Initialize new first element space
+    memset(vec->data, 0, sizeof(string_t));
+    
+    // Allocate and copy the new string
+    size_t str_len = strlen(value);
+    vec->data[0].str = malloc(str_len + 1);
+    if (!vec->data[0].str) {
+        errno = ENOMEM;
+        memmove(vec->data, vec->data + 1, vec->len * sizeof(string_t));
+        return false;
+    }
+    
+    strcpy(vec->data[0].str, value);
+    vec->data[0].alloc = str_len + 1;
+    vec->data[0].len = str_len;
+    vec->len++;
+    return true;
+}
+// --------------------------------------------------------------------------------
+
 const string_t* str_vector_index(const string_v* vec, size_t index) {
     if (!vec || !vec->data) {
         errno = EINVAL;

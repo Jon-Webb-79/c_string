@@ -129,6 +129,97 @@ void test_str_vector_gbc(void **state) {
        assert_string_equal(get_string(str_vector_index(vec, i)), strings[i]);
    }
 }
+// --------------------------------------------------------------------------------
+
+void test_push_front_empty_vector(void **state) {
+    string_v* vec = init_str_vector(2);
+   
+    assert_true(push_front_str_vector(vec, "first"));
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_push_front_existing_elements(void **state) {
+    string_v* vec = init_str_vector(2);
+   
+    // Add from back first
+    assert_true(push_back_str_vector(vec, "back"));
+    assert_true(push_front_str_vector(vec, "front"));
+   
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "front");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "back");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_push_front_reallocation(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    // Fill initial allocation
+    assert_true(push_front_str_vector(vec, "first"));
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_int_equal(str_vector_alloc(vec), 1);
+   
+    // This should trigger resize
+    assert_true(push_front_str_vector(vec, "second"));
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_true(str_vector_alloc(vec) > 1);
+   
+    // Verify order is maintained
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "second");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "first");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_push_front_multiple(void **state) {
+    string_v* vec = init_str_vector(2);
+    const char* strings[] = {"three", "two", "one"};
+   
+    for (size_t i = 0; i < 3; i++) {
+        assert_true(push_front_str_vector(vec, strings[i]));
+        assert_int_equal(str_vector_size(vec), i + 1);
+        assert_string_equal(get_string(str_vector_index(vec, 0)), strings[i]);
+    }
+   
+    // Verify final order
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "one");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "two");
+    assert_string_equal(get_string(str_vector_index(vec, 2)), "three");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_push_front_null_inputs(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    assert_false(push_front_str_vector(NULL, "test"));
+    assert_int_equal(errno, EINVAL);
+   
+    assert_false(push_front_str_vector(vec, NULL));
+    assert_int_equal(errno, EINVAL);
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_push_front_empty_string(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    assert_true(push_front_str_vector(vec, ""));
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "");
+    assert_int_equal(string_size(str_vector_index(vec, 0)), 0);
+   
+    free_str_vector(vec);
+}
 // ================================================================================
 // ================================================================================
 // eof

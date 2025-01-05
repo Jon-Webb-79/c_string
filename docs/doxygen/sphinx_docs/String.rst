@@ -149,6 +149,8 @@ trim_string
      Before trim - Content: Hello, Size: 5, Allocated: 20
      After trim  - Content: Hello, Size: 5, Allocated: 6
 
+.. _free-string-func:
+
 free_string
 ^^^^^^^^^^^
 .. c:function:: void free_string(string_t* str)
