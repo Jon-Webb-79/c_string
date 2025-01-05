@@ -220,6 +220,117 @@ void test_push_front_empty_string(void **state) {
    
     free_str_vector(vec);
 }
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_middle(void **state) {
+   string_v* vec = init_str_vector(3);
+   
+   // Create initial vector: "first", "third"
+   push_back_str_vector(vec, "first");
+   push_back_str_vector(vec, "third");
+   
+   // Insert in middle
+   assert_true(insert_str_vector(vec, "second", 1));
+   assert_int_equal(str_vector_size(vec), 3);
+   
+   // Verify order
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "second");
+   assert_string_equal(get_string(str_vector_index(vec, 2)), "third");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_start(void **state) {
+   string_v* vec = init_str_vector(2);
+   
+   push_back_str_vector(vec, "old_first");
+   
+   // Insert at start
+   assert_true(insert_str_vector(vec, "new_first", 0));
+   assert_int_equal(str_vector_size(vec), 2);
+   
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "new_first");
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "old_first");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_end(void **state) {
+   string_v* vec = init_str_vector(2);
+   
+   push_back_str_vector(vec, "first");
+   
+   // Insert at end (equivalent to push_back)
+   assert_true(insert_str_vector(vec, "last", 1));
+   assert_int_equal(str_vector_size(vec), 2);
+    
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "last");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_reallocation(void **state) {
+   string_v* vec = init_str_vector(1);
+   
+   // Fill initial allocation
+   push_back_str_vector(vec, "first");
+   size_t initial_alloc = str_vector_alloc(vec);
+   
+   // This should trigger resize
+   assert_true(insert_str_vector(vec, "middle", 1));
+   assert_true(str_vector_alloc(vec) > initial_alloc);
+   
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "middle");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_invalid_index(void **state) {
+   string_v* vec = init_str_vector(2);
+   push_back_str_vector(vec, "first");
+   
+   // Try to insert beyond end
+   assert_false(insert_str_vector(vec, "invalid", 2));
+   assert_int_equal(errno, ERANGE);
+   
+   // Verify original string unchanged
+   assert_int_equal(str_vector_size(vec), 1);
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_null_inputs(void **state) {
+   string_v* vec = init_str_vector(2);
+   
+   assert_false(insert_str_vector(NULL, "test", 0));
+   assert_int_equal(errno, EINVAL);
+   
+   assert_false(insert_str_vector(vec, NULL, 0));
+   assert_int_equal(errno, EINVAL);
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_str_vector_empty_string(void **state) {
+   string_v* vec = init_str_vector(2);
+   push_back_str_vector(vec, "test");
+   
+   assert_true(insert_str_vector(vec, "", 1));
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "");
+   assert_int_equal(string_size(str_vector_index(vec, 1)), 0);
+   
+   free_str_vector(vec);
+}
 // ================================================================================
 // ================================================================================
 // eof

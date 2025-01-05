@@ -237,7 +237,7 @@ push_front_str_vector
 
   .. code-block:: c
 
-     string_v* vec = init_str_vector(2);
+     string_v* vec STRVEC_GBC = init_str_vector(2);
      
      // Add "world" at the back
      push_back_str_vector(vec, "world");
@@ -251,8 +251,6 @@ push_front_str_vector
          printf("\n");
      }
      
-     free_str_vector(vec);
-
   Output::
 
      hello world
@@ -281,6 +279,57 @@ push_front_str_vector
   Output::
 
      hello world
+
+  The folllowing should be considered when using this function
+
+  * If reallocation fails, the original vector remains unchanged
+  * If string allocation fails after moving elements, the vector is restored to its original state
+  * The operation requires enough contiguous memory for the entire resized array
+
+  .. note::
+
+     When resizing is needed, the vector grows either by doubling (when size < VEC_THRESHOLD)
+     or by adding a fixed amount (when size >= VEC_THRESHOLD). This provides efficient
+     amortized performance for both small and large vectors.
+
+insert_str_vector
+~~~~~~~~~~~~~~~~~
+.. c:function:: bool insert_str_vector(string_v* vec, const char* str, size_t index)
+
+  Inserts a string at any valid position in the vector, shifting subsequent
+  elements to the right. Automatically resizes the vector if needed.
+  The time complexity of this function can range from :math:`O(1)` to
+  :math:`O(n)` depending on where the data is inserted.
+
+  :param vec: Target string vector
+  :param str: String to insert
+  :param index: Position at which to insert (0 to vec->len)
+  :returns: true if successful, false on error
+  :raises: Sets errno to EINVAL for NULL inputs, ERANGE for invalid index,
+          or ENOMEM on allocation failure
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec STRVEC_GBC = init_str_vector(3);
+     
+     // Create initial vector
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "third");
+     
+     // Insert "second" between them
+     if (insert_str_vector(vec, "second", 1)) {
+         // Print all strings
+         for (size_t i = 0; i < str_vector_size(vec); i++) {
+             printf("%s ", get_string(str_vector_index(vec, i)));
+         }
+         printf("\n");
+     }
+
+  Output::
+
+     first second third
 
   The folllowing should be considered when using this function
 

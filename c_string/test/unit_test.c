@@ -173,7 +173,20 @@ const struct CMUnitTest test_string_vector[] = {
     cmocka_unit_test(test_str_vector_null_inputs),
     cmocka_unit_test(test_str_vector_empty_string),
     cmocka_unit_test(test_str_vector_multiple_pushes),
-    cmocka_unit_test(test_str_vector_gbc)
+    cmocka_unit_test(test_str_vector_gbc),
+    cmocka_unit_test(test_push_front_empty_vector),
+    cmocka_unit_test(test_push_front_existing_elements),
+    cmocka_unit_test(test_push_front_reallocation),
+    cmocka_unit_test(test_push_front_multiple),
+    cmocka_unit_test(test_push_front_null_inputs),
+    cmocka_unit_test(test_push_front_empty_string),
+    cmocka_unit_test(test_insert_str_vector_middle),
+    cmocka_unit_test(test_insert_str_vector_start),
+    cmocka_unit_test(test_insert_str_vector_end),
+    cmocka_unit_test(test_insert_str_vector_reallocation),
+    cmocka_unit_test(test_insert_str_vector_invalid_index),
+    cmocka_unit_test(test_insert_str_vector_null_inputs),
+    cmocka_unit_test(test_insert_str_vector_empty_string),
 };
 // ================================================================================ 
 // ================================================================================ 

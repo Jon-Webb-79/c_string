@@ -1195,6 +1195,66 @@ bool push_front_str_vector(string_v* vec, const char* value) {
 }
 // --------------------------------------------------------------------------------
 
+bool insert_str_vector(string_v* vec, const char* str, size_t index) {
+    if (!vec || !vec->data || !str) {
+        errno = EINVAL;
+        return false;
+    }
+    if (index > vec->len) {
+        errno = ERANGE;
+        return false;
+    }
+   
+    // Check if we need to resize
+    if (vec->len >= vec->alloc) {
+        size_t new_alloc = vec->alloc == 0 ? 1 : vec->alloc;
+        if (new_alloc < VEC_THRESHOLD) {
+            new_alloc *= 2;
+        } else {
+            new_alloc += VEC_FIXED_AMOUNT;
+        }
+       
+        string_t* new_data = realloc(vec->data, new_alloc * sizeof(string_t));
+        if (!new_data) {
+            errno = ENOMEM;
+            return false;
+        }
+       
+        memset(new_data + vec->alloc, 0, (new_alloc - vec->alloc) * sizeof(string_t));
+       
+        vec->data = new_data;
+        vec->alloc = new_alloc;
+    }
+    
+    // Move existing elements right
+    if (index < vec->len) {  // Only move if not appending
+        memmove(vec->data + index + 1, vec->data + index, 
+                (vec->len - index) * sizeof(string_t));
+    }
+    
+    // Initialize new element space
+    memset(vec->data + index, 0, sizeof(string_t));
+    
+    // Allocate and copy the new string
+    size_t str_len = strlen(str);
+    vec->data[index].str = malloc(str_len + 1);
+    if (!vec->data[index].str) {
+        errno = ENOMEM;
+        if (index < vec->len) {  // Only restore if not appending
+            memmove(vec->data + index, vec->data + index + 1, 
+                    (vec->len - index) * sizeof(string_t));
+        }
+        return false;
+    }
+    
+    strcpy(vec->data[index].str, str);
+    vec->data[index].alloc = str_len + 1;
+    vec->data[index].len = str_len;
+    vec->len++;
+    return true;
+}
+// --------------------------------------------------------------------------------
+
 const string_t* str_vector_index(const string_v* vec, size_t index) {
     if (!vec || !vec->data) {
         errno = EINVAL;
