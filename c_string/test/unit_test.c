@@ -158,6 +158,11 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_trim_all_nominal),
         cmocka_unit_test(test_trim_all_multiple_types),
         cmocka_unit_test(test_trim_all_no_whitespace),
+        cmocka_unit_test(test_string_iterator_forward),
+        cmocka_unit_test(test_string_iterator_reverse),
+        cmocka_unit_test(test_string_iterator_empty_string),
+        cmocka_unit_test(test_string_iterator_null_string),
+        cmocka_unit_test(test_string_iterator_bounds),
 	};
 	return cmocka_run_group_tests(test_string, NULL, NULL);
 }

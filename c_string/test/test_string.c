@@ -1618,6 +1618,95 @@ void test_trim_all_whitespace_string(void **state) {
    
     free_string(str);
 }
+// --------------------------------------------------------------------------------
+
+void test_string_iterator_forward(void **state) {
+   string_t* str = init_string("hello");
+   str_iter iter = init_str_iter();
+   
+   char* current = iter.begin(str);
+   //char* end = iter.end(str);
+   
+   // Verify forward iteration
+   assert_int_equal(iter.get(&current), 'h');
+   iter.next(&current);
+   assert_int_equal(iter.get(&current), 'e');
+   iter.next(&current);
+   assert_int_equal(iter.get(&current), 'l');
+   iter.next(&current);
+   assert_int_equal(iter.get(&current), 'l');
+   iter.next(&current);
+   assert_int_equal(iter.get(&current), 'o');
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_iterator_reverse(void **state) {
+   string_t* str = init_string("hello");
+   str_iter iter = init_str_iter();
+   
+   char* current = iter.end(str) - 1;  // Start from last character
+   //char* begin = iter.begin(str);
+   
+   // Verify reverse iteration
+   assert_int_equal(iter.get(&current), 'o');
+   iter.prev(&current);
+   assert_int_equal(iter.get(&current), 'l');
+   iter.prev(&current);
+   assert_int_equal(iter.get(&current), 'l');
+   iter.prev(&current);
+   assert_int_equal(iter.get(&current), 'e');
+   iter.prev(&current);
+   assert_int_equal(iter.get(&current), 'h');
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_iterator_empty_string(void **state) {
+   string_t* str = init_string("");
+   str_iter iter = init_str_iter();
+   
+   char* begin = iter.begin(str);
+   char* end = iter.end(str);
+   
+   // Verify begin and end point to same location for empty string
+   assert_ptr_equal(begin, end);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_iterator_null_string(void **state) {
+   str_iter iter = init_str_iter();
+   
+   char* begin = iter.begin(NULL);
+   assert_null(begin);
+   assert_int_equal(errno, EINVAL);
+   
+   char* end = iter.end(NULL);
+   assert_null(end);
+   assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_string_iterator_bounds(void **state) {
+   string_t* str = init_string("test");
+   str_iter iter = init_str_iter();
+   
+   char* begin = iter.begin(str);
+   char* end = iter.end(str);
+   
+   // Verify begin points to first character
+   assert_int_equal(iter.get(&begin), 't');
+   
+   // Verify end points one past last character
+   char* last = end - 1;
+   assert_int_equal(iter.get(&last), 't');
+   
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof

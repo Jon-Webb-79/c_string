@@ -634,6 +634,19 @@ void trim_trailing_whitespace(string_t* str);
  * @param str A string_t data type 
  */
 void trim_all_whitespace(string_t* str);
+// ================================================================================
+// ================================================================================
+
+typedef struct str_iter {
+    char* (*begin) (string_t *s);
+    char* (*end) (string_t *s);
+    void (*next) (char** current);
+    void (*prev) (char** current);
+    char (*get) (char** current);
+} str_iter;
+// -------------------------------------------------------------------------------- 
+
+str_iter init_str_iter();
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

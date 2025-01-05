@@ -1584,3 +1584,89 @@ token_count
 
 .. note:: The function treats any character in the delim string as a delimiter. For example, if delim is ".,", both period and comma will be treated as delimiters. 
 
+String Iterator
+---------------
+
+The string iterator provides direct character-level access to a string_t object. While the c_string
+library generally encourages using its provided functions for string manipulation, the iterator
+offers more granular control when needed.
+
+.. warning::
+  Direct string manipulation through the iterator should be used with caution. Modifying string
+  contents directly (especially inserting null terminators or changing string length) without
+  updating the string_t metadata can lead to undefined behavior.
+
+str_iter
+~~~~~~~~
+.. c:type:: str_iter
+
+  Structure containing function pointers for string iteration.
+
+  .. c:member:: char* (*begin)(string_t* s)
+  
+     Returns pointer to the first character of the string
+
+  .. c:member:: char* (*end)(string_t* s)
+  
+     Returns pointer to position after the last character
+
+  .. c:member:: void (*next)(char** current)
+  
+     Advances iterator to next character
+
+  .. c:member:: void (*prev)(char** current)
+  
+     Moves iterator to previous character
+
+  .. c:member:: char (*get)(char** current)
+  
+     Returns character at current iterator position
+
+init_str_iter
+~~~~~~~~~~~~~
+.. c:function:: str_iter init_str_iter(void)
+
+  Initializes and returns a string iterator object.
+
+Example:
+
+.. code-block:: c
+
+  string_t* str = init_string("Hello");
+  str_iter iter = init_str_iter();
+  
+  // Forward iteration
+  char* current = iter.begin(str);
+  char* end = iter.end(str);
+  
+  while (current != end) {
+      printf("%c", iter.get(&current));
+      iter.next(&current);
+  }
+  printf("\n");
+  
+  // Reverse iteration
+  current = iter.end(str) - 1;  // Start from last character
+  char* begin = iter.begin(str);
+  
+  while (current >= begin) {
+      printf("%c", iter.get(&current));
+      iter.prev(&current);
+  }
+  printf("\n");
+  
+  free_string(str);
+
+Output::
+
+  Hello
+  olleH
+
+Safe Usage Guidelines
+~~~~~~~~~~~~~~~~~~~~~
+* Do not insert null terminators within the string
+* Do not modify string length without updating the string_t length field
+* Stay within the string bounds (begin to end)
+* Check for NULL return values from begin() and end()
+* Use the provided string manipulation functions when possible
+
