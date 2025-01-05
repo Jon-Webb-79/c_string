@@ -22,7 +22,7 @@ format
        char* str;
        size_t len;
        size_t alloc;
-    }
+   } string_t;
 
 
 Core Functions
@@ -33,7 +33,7 @@ desctruction of ``size_t`` data types.
 Initialization and Memory Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The functions and Macros in this section are used to control the creation,
-memory allocation, and specific destruction of ``size_t`` data types.
+memory allocation, and specific destruction of ``string_t`` data types.
 
 init_string
 ^^^^^^^^^^^

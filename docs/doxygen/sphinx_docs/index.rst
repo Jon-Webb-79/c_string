@@ -50,6 +50,7 @@ C++ language.
    :caption: Contents:
 
    C Strings <String>
+   String Vector <Vector>
 
 Indices and tables
 ==================

@@ -636,6 +636,7 @@ void trim_trailing_whitespace(string_t* str);
 void trim_all_whitespace(string_t* str);
 // ================================================================================
 // ================================================================================
+// STRING ITERATOR
 
 typedef struct str_iter {
     char* (*begin) (string_t *s);
@@ -647,6 +648,180 @@ typedef struct str_iter {
 // -------------------------------------------------------------------------------- 
 
 str_iter init_str_iter();
+// ================================================================================ 
+// ================================================================================ 
+
+/**
+* @struct string_v
+* @brief Dynamic array (vector) container for string_t objects
+*
+* This structure manages a resizable array of string_t objects with automatic
+* memory management and capacity handling.
+*/
+typedef struct string_v string_v;
+// --------------------------------------------------------------------------------
+
+/**
+* @function init_str_vector
+* @brief Initializes a new string vector with specified initial capacity
+*
+* @param buffer Initial capacity (number of strings) to allocate
+* @return Pointer to new string_v object, or NULL on allocation failure
+*         Sets errno to ENOMEM if memory allocation fails
+*/
+string_v* init_str_vector(size_t buffer);
+// --------------------------------------------------------------------------------
+
+/**
+* @function push_back_str_vector
+* @brief Adds a string to the end of the vector
+*
+* Automatically resizes the vector if necessary.
+*
+* @param vec Target string vector
+* @param value String to add
+* @return true if successful, false on error
+*         Sets errno to EINVAL for NULL inputs or ENOMEM on allocation failure
+*/
+bool push_back_str_vector(string_v* vec, const char* value);
+// --------------------------------------------------------------------------------
+
+/**
+* @function push_front_str_vector
+* @brief Adds a string to the beginning of the vector
+*
+* Shifts existing elements right and automatically resizes if necessary.
+*
+* @param vec Target string vector
+* @param value String to add
+* @return true if successful, false on error
+*         Sets errno to EINVAL for NULL inputs or ENOMEM on allocation failure
+*/
+bool push_front_str_vector(string_v* vec, const char* value);
+// --------------------------------------------------------------------------------
+
+/**
+* @function insert_str_vector
+* @brief Inserts a string at specified index in the vector
+*
+* Shifts elements right starting at index and resizes if necessary.
+*
+* @param vec Target string vector
+* @param value String to insert
+* @param index Position to insert at
+* @return true if successful, false on error
+*         Sets errno to EINVAL for NULL inputs or index out of bounds, ENOMEM on allocation failure
+*/
+bool insert_str_vector(string_v* vec, const char* value, size_t index);
+// --------------------------------------------------------------------------------
+
+/**
+* @function str_vector_index
+* @brief Retrieves pointer to string_t at specified index
+*
+* @param vec Source string vector
+* @param index Position to access
+* @return Pointer to string_t object, or NULL on error
+*         Sets errno to EINVAL for NULL input or ERANGE if index out of bounds
+*/
+const string_t* str_vector_index(const string_v* vec, size_t index);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function str_vector_size
+* @brief Returns current number of strings in vector
+*
+* @param vec String vector to query
+* @return Number of strings in vector, or LONG_MAX on error
+*         Sets errno to EINVAL for NULL input
+*/
+const size_t str_vector_size(const string_v* vec);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function str_vector_alloc
+* @brief Returns current allocation size of vector
+*
+* @param vec String vector to query
+* @return Current allocation capacity, or LONG_MAX on error
+*         Sets errno to EINVAL for NULL input
+*/
+const size_t str_vector_alloc(const string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+* @function pop_back_str_vector
+* @brief Removes and returns last string in vector
+*
+* @param vec Source string vector
+* @return Pointer to removed string_t object, or NULL if vector empty
+*         Sets errno to EINVAL for NULL input
+*/
+string_t* pop_back_str_vector(string_v* vec);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function pop_front_str_vector
+* @brief Removes and returns first string in vector
+*
+* Shifts remaining elements left.
+*
+* @param vec Source string vector
+* @return Pointer to removed string_t object, or NULL if vector empty
+*         Sets errno to EINVAL for NULL input
+*/
+string_t* pop_front_str_vector(string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+* @function pup_any_str_vector
+* @brief Removes and returns string at specified index
+*
+* Shifts remaining elements left to fill gap.
+*
+* @param vec Source string vector
+* @param index Position to remove from
+* @return Pointer to removed string_t object, or NULL on error
+*         Sets errno to EINVAL for NULL input or ERANGE if index out of bounds
+*/
+string_t* pup_any_str_vector(string_v* vec, size_t index);
+// --------------------------------------------------------------------------------
+
+/**
+* @function free_str_vector
+* @brief Frees all memory associated with string vector
+*
+* Frees all contained strings and the vector itself.
+*
+* @param vec String vector to free
+* @return void
+*         Sets errno to EINVAL for NULL input
+*/
+void free_str_vector(string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+* @function _free_str_vector
+* @brief Helper function for garbage collection of string vectors
+*
+* Used with STRVEC_GBC macro for automatic cleanup.
+*
+* @param vec Double pointer to string vector to free
+* @return void
+*/
+void _free_str_vector(string_v** vec);
+// --------------------------------------------------------------------------------
+
+#if defined(__GNUC__) || defined (__clang__)
+    /**
+     * @macro STRVEC_GBC
+     * @brief A macro for enabling automatic cleanup of str_vector objects.
+     *
+     * This macro uses the cleanup attribute to automatically call `_free_str_vector`
+     * when the scope ends, ensuring proper memory management.
+     */
+    #define STRVEC_GBC __attribute__((cleanup(_free_str_vector)))
+#endif
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

@@ -14,11 +14,17 @@
 
 #include "include/c_string.h"
 
+#include <asm-generic/errno-base.h>
 #include <errno.h>  // For errno and strerror 
 #include <stdlib.h> // For size_t, malloc, and realloc
 #include <string.h> // For strerror
 #include <limits.h> // For INT_MIN
 #include <ctype.h>  // For isspace
+// ================================================================================ 
+// ================================================================================
+
+static const size_t VEC_THRESHOLD = 1 * 1024 * 1024;  // 1 MB
+static const size_t VEC_FIXED_AMOUNT = 1 * 1024 * 1024;  // 1 MB
 // ================================================================================ 
 // ================================================================================ 
 // STRING_T DATA TYPE 
@@ -1033,6 +1039,140 @@ str_iter init_str_iter() {
     iter.prev = _str_prev;
     iter.get = _str_get;
     return iter;
+}
+// ================================================================================ 
+// ================================================================================ 
+
+struct string_v {
+    string_t* data;
+    size_t len;
+    size_t alloc;
+};
+// -------------------------------------------------------------------------------- 
+
+string_v* init_str_vector(size_t buff) {
+    string_v* struct_ptr = malloc(sizeof(string_v));
+    if (struct_ptr == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+   
+    string_t* data_ptr = malloc(buff * sizeof(string_t));
+    if (data_ptr == NULL) {
+        free(struct_ptr);
+        errno = ENOMEM;
+        return NULL; 
+    }
+   
+    // Initialize all elements
+    memset(data_ptr, 0, buff * sizeof(string_t));
+   
+    struct_ptr->data = data_ptr;
+    struct_ptr->len = 0;
+    struct_ptr->alloc = buff;
+    return struct_ptr;
+}
+// --------------------------------------------------------------------------------
+
+void free_str_vector(string_v* vec) {
+   if (!vec) {
+       errno = EINVAL;
+       return;
+   }
+   
+   // Free each string in the vector
+   if (vec->data) {
+       for (size_t i = 0; i < vec->len; i++) {
+           free(vec->data[i].str);
+       }
+       free(vec->data);
+   }
+   free(vec);
+}
+// --------------------------------------------------------------------------------
+
+void _free_str_vector(string_v** vec) {
+    if (vec && *vec) {
+        free_str_vector(*vec);
+        *vec = NULL;
+    }
+}
+// -------------------------------------------------------------------------------- 
+
+bool push_back_str_vector(string_v* vec, const char* value) {
+    if (!vec || !vec->data || !value) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    // Check if we need to resize
+    if (vec->len >= vec->alloc) {
+        size_t new_alloc = vec->alloc == 0 ? 1 : vec->alloc;
+        if (new_alloc < VEC_THRESHOLD) {
+            new_alloc *= 2;
+        } else {
+            new_alloc += VEC_FIXED_AMOUNT;
+        }
+       
+        // Allocate more space for the array of str structs
+        string_t* new_data = realloc(vec->data, new_alloc * sizeof(string_t));
+        if (!new_data) {
+            errno = ENOMEM;
+            return false;
+        }
+       
+        // Initialize new elements
+        memset(new_data + vec->alloc, 0, (new_alloc - vec->alloc) * sizeof(string_t));
+       
+        vec->data = new_data;
+        vec->alloc = new_alloc;
+    }
+   
+    // Allocate and copy the new string
+    size_t str_len = strlen(value);
+    vec->data[vec->len].str = malloc(str_len + 1);
+    if (!vec->data[vec->len].str) {
+        errno = ENOMEM;
+        return false;
+    }
+   
+    strcpy(vec->data[vec->len].str, value);
+    vec->data[vec->len].alloc = str_len + 1;
+    vec->data[vec->len].len = str_len;
+    vec->len++;
+   
+    return true;
+}
+// --------------------------------------------------------------------------------
+
+const string_t* str_vector_index(const string_v* vec, size_t index) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return NULL;
+    }
+    if (index > vec->len - 1) {
+        errno = ERANGE;
+        return NULL;
+    }
+    return &vec->data[index];
+}
+// --------------------------------------------------------------------------------
+
+const size_t str_vector_size(const string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return LONG_MAX;
+    }
+    return vec->len;
+}
+// --------------------------------------------------------------------------------
+
+const size_t str_vector_alloc(const string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return LONG_MAX;
+    }
+    return vec->alloc;
 }
 // ================================================================================
 // ================================================================================
