@@ -564,13 +564,17 @@ void test_pop_any_null_vector(void **state) {
 
 void test_pop_any_multiple(void **state) {
     string_v* vec = init_str_vector(4);
+    assert_int_equal(4, s_alloc(vec));
     push_back_str_vector(vec, "one");
     push_back_str_vector(vec, "two");
     push_back_str_vector(vec, "three");
     push_back_str_vector(vec, "four");
    
+    assert_int_equal(4, s_size(vec));
     // Pop elements in various positions
     string_t* popped1 = pop_any_str_vector(vec, 1);  // Pop "two"
+    assert_int_equal(3, s_size(popped1));
+    assert_int_equal(4, s_alloc(popped1));
     assert_string_equal(get_string(popped1), "two");
     free_string(popped1);
    

@@ -824,6 +824,34 @@ void _free_str_vector(string_v** vec);
 #endif
 // ================================================================================ 
 // ================================================================================ 
+// GENERIC MACROS 
+
+/**
+* @macro s_size
+* @brief Generic macro to return the populated length of a string data type such as
+*        string_t and string_v
+*
+* @param dat A pointer to a string_t or strinv_v data type
+* @return The populated length of a string data type
+*/
+#define s_size(dat) _Generic((dat), \
+    string_t*: string_size, \
+    string_v*: str_vector_size) (dat)
+// --------------------------------------------------------------------------------
+
+/**
+* @macro s_alloc
+* @brief Generic macro to return the allocated size of a string data type such as
+*        string_t and string_v
+*
+* @param dat A pointer to a string_t or strinv_v data type
+* @return The allocated length of a string data type
+*/
+#define s_alloc(dat) _Generic((dat), \
+    string_t*: string_alloc, \
+    string_v*: str_vector_alloc) (dat)
+// ================================================================================ 
+// ================================================================================ 
 #ifdef __cplusplus
 }
 // ================================================================================

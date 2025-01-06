@@ -51,6 +51,7 @@ C++ language.
 
    C Strings <String>
    String Vector <Vector>
+   Generic Macros <Macros>
 
 Indices and tables
 ==================

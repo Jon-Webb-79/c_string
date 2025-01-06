@@ -236,6 +236,8 @@ get_string
 
      String content: Hello, World!
 
+.. _string-size-func:
+
 string_size
 ~~~~~~~~~~~
 .. c:function:: const size_t string_size(const string_t* str)
@@ -268,6 +270,11 @@ string_size
      String: Hello
      Length: 5
 
+The developer may consider the use of the :ref:`s-size-macro` Macro as a generic 
+helper function to determine the populated size of a string data type.
+
+.. _string-alloc-func:
+
 string_alloc
 ~~~~~~~~~~~~
 .. c:function:: const size_t string_alloc(const string_t* str)
@@ -297,6 +304,9 @@ string_alloc
      Length: 4
      Allocated: 5
 
+The developer may consider the use of the :ref:`s-alloc-macro` Macro as a generic 
+helper function to determine the allocated size of a string data type.
+
 String Manipulation Functions
 -----------------------------
 The functions and Macros within this section allow a user to manipulate the 
@@ -308,6 +318,8 @@ These functions and macros allow a user to concatenate data to a ``string_t``
 data type with a string literal or another ``string_t`` data type.  These 
 functions are essentially the equivalent of a ``push_back`` function for the 
 ``string_t`` data type.
+
+.. _string-string-concat-func:
 
 string_string_concat
 ^^^^^^^^^^^^^^^^^^^^
@@ -341,6 +353,8 @@ string_string_concat
      Before: Hello 
      After:  Hello World!
 
+.. _string-lit-concat-func:
+
 string_lit_concat
 ^^^^^^^^^^^^^^^^^
 .. c:function:: bool string_lit_concat(string_t* str1, const char* literal)
@@ -370,40 +384,6 @@ string_lit_concat
 
      Before: Hello 
      After:  Hello World!
-
-.. _string-concat-macro:
-
-string_concat Macro
-^^^^^^^^^^^^^^^^^^^
-.. c:macro:: string_concat(str_one, str_two)
-
-  A generic macro that automatically selects the appropriate concatenation function
-  based on the type of the second argument.
-
-  Example:
-
-  .. code-block:: c
-
-     string_t* str1 STRING_GBC = init_string("Hello ");
-     string_t* str2 STRING_GBC = init_string("World ");
-     
-     if (str1 && str2) {
-         printf("Initial: %s\n", get_string(str1));
-         
-         // Using macro with string_t
-         string_concat(str1, str2);
-         printf("After string_t concat: %s\n", get_string(str1));
-         
-         // Using macro with literal
-         string_concat(str1, "!!!");
-         printf("After literal concat: %s\n", get_string(str1));
-     }
-
-  Output::
-
-     Initial: Hello 
-     After string_t concat: Hello World 
-     After literal concat: Hello World !!!
 
 Drop Substring Functions and Macros 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -823,6 +803,8 @@ String Comparison Functions
 The functions and Macros in this section are used to compare to strings 
 for equivalance or for their differences.
 
+.. _string-lit-compare-func:
+
 compare_strings_lit
 ~~~~~~~~~~~~~~~~~~~
 .. c:function:: int compare_strings_lit(const string_t* str_struct, const char* string)
@@ -862,6 +844,8 @@ compare_strings_lit
      Comparing 'hello' with 'hello': 0
      Comparing 'hello' with 'world': -15
      Comparing 'hello' with 'apple': 7
+
+.. _string-string-compare-func:
 
 compare_strings_string
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -906,42 +890,6 @@ compare_strings_string
 
      Comparing 'hello' with 'world': -15
      Comparing 'hello' with 'hello': 0
-
-.. _compare-strings-macro:
-
-compare_strings Macro
-~~~~~~~~~~~~~~~~~~~~~
-.. c:macro:: compare_strings(str_one, str_two)
-
-  A generic macro that automatically selects the appropriate comparison function
-  based on the type of the second argument.  This macro is the equivalent of the 
-  ``strcmp`` function from the ``string.h`` header file and is bounded by the size 
-  of the first string, and is not subject to buffer overflow attacks.
-
-  Example:
-
-  .. code-block:: c
-
-     string_t* str1 = init_string("hello");
-     string_t* str2 = init_string("world");
-     
-     if (str1 && str2) {
-         // Compare with string_t
-         printf("Compare with string_t: %d\n", 
-                compare_strings(str1, str2));
-         
-         // Compare with literal
-         printf("Compare with literal: %d\n", 
-                compare_strings(str1, "hello"));
-         
-         free_string(str1);
-         free_string(str2);
-     }
-
-  Output::
-
-     Compare with string_t: -15
-     Compare with literal: 0
 
 String Utility Functions
 ------------------------

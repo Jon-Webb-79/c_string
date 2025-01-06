@@ -494,3 +494,127 @@ STRVEC_GBC
          
          // No need to call free_str_vector
      }  // vec is 
+
+Utility Functions
+=================
+The following functions can be used to retrieve basic information from 
+a ``string_v`` data type.
+
+Vector Size and Access Functions 
+--------------------------------
+The following functions are used to determine the allocated size and populated 
+length of a ``string_v`` data type/
+
+.. _str-vector-index-func:
+
+str_vector_index
+~~~~~~~~~~~~~~~~
+.. c:function:: const string_t* str_vector_index(const string_v* vec, size_t index)
+
+  Retrieves a pointer to the string_t object at the specified index in the vector.
+  Provides safe, bounds-checked access to vector elements.
+
+  :param vec: Source string vector
+  :param index: Zero-based index of desired element
+  :returns: Pointer to string_t at specified index, or NULL on error
+  :raises: Sets errno to EINVAL for NULL input, ERANGE for out-of-bounds index
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(2);
+     push_back_str_vector(vec, "hello");
+     push_back_str_vector(vec, "world");
+     
+     const string_t* str = str_vector_index(vec, 1);
+     if (str) {
+         printf("Second string: %s\n", get_string(str));
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Second string: world
+
+.. _str-vector-size-func:
+
+str_vector_size
+~~~~~~~~~~~~~~~
+.. c:function:: const size_t str_vector_size(const string_v* vec)
+
+  Returns the current number of elements in the vector. This represents the
+  actual number of strings stored, not the allocated capacity.
+
+  :param vec: String vector to query
+  :returns: Number of elements in vector, or LONG_MAX on error
+  :raises: Sets errno to EINVAL for NULL input
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(5);  // Capacity of 5
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     
+     printf("Vector size: %zu\n", str_vector_size(vec));
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Vector size: 2
+
+The developer may also consider the safe use of the :ref:`s_alloc <s-size-macro>`
+Macro in place of the ``str_vector_size`` function.
+
+.. _str-vector-alloc-func:
+
+str_vector_alloc
+~~~~~~~~~~~~~~~~
+.. c:function:: const size_t str_vector_alloc(const string_v* vec)
+
+  Returns the current allocation size (capacity) of the vector. This represents
+  the number of elements that can be stored without requiring reallocation.
+
+  :param vec: String vector to query
+  :returns: Current allocation size, or LONG_MAX on error
+  :raises: Sets errno to EINVAL for NULL input
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(5);
+     
+     printf("Initial capacity: %zu\n", str_vector_alloc(vec));
+     
+     // Add strings until reallocation occurs
+     for(int i = 0; i < 6; i++) {
+         push_back_str_vector(vec, "test");
+         printf("After push %d - Size: %zu, Capacity: %zu\n",
+                i + 1, str_vector_size(vec), str_vector_alloc(vec));
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Initial capacity: 5
+     After push 1 - Size: 1, Capacity: 5
+     After push 2 - Size: 2, Capacity: 5
+     After push 3 - Size: 3, Capacity: 5
+     After push 4 - Size: 4, Capacity: 5
+     After push 5 - Size: 5, Capacity: 5
+     After push 6 - Size: 6, Capacity: 10
+
+The developer may also consider the safe use of the :ref:`s_alloc <s-alloc-macro>`
+Macro in place of the ``str_vector_alloc`` function.
+
+.. note::
+
+  These functions provide the basic mechanisms for inspecting a vector's state
+  and accessing its contents. They are fundamental to safe vector manipulation
+  and are used extensively by other vector operations.
