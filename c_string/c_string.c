@@ -1255,6 +1255,102 @@ bool insert_str_vector(string_v* vec, const char* str, size_t index) {
 }
 // --------------------------------------------------------------------------------
 
+string_t* pop_back_str_vector(string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    // Create copy of last element
+    string_t* temp = copy_string(&vec->data[vec->len - 1]);
+    if (!temp) {
+        return NULL;  // copy_string will set errno
+    }
+    
+    // Clear the popped element for future reuse
+    free(vec->data[vec->len - 1].str);
+    vec->data[vec->len - 1].str = NULL;
+    vec->data[vec->len - 1].len = 0;
+    vec->data[vec->len - 1].alloc = 0;
+    
+    vec->len--;
+    return temp;
+}
+// --------------------------------------------------------------------------------
+
+string_t* pop_front_str_vector(string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return NULL;
+    }
+   
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return NULL;
+    }
+   
+    // Create copy of first element
+    string_t* temp = copy_string(&vec->data[0]);
+    if (!temp) {
+        return NULL;  // copy_string will set errno
+    }
+   
+    // Free the first element
+    free(vec->data[0].str);
+   
+    // Shift remaining elements left
+    memmove(vec->data, vec->data + 1, (vec->len - 1) * sizeof(string_t));
+   
+    // Clear the last element (which was moved)
+    memset(&vec->data[vec->len - 1], 0, sizeof(string_t));
+   
+    vec->len--;
+    return temp;
+}
+// --------------------------------------------------------------------------------
+
+string_t* pop_any_str_vector(string_v* vec, size_t index) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return NULL;
+    }
+   
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    if (index >= vec->len) {
+        errno = ERANGE;
+        return NULL;
+    }
+
+    // Create copy of element to pop
+    string_t* temp = copy_string(&vec->data[index]);
+    if (!temp) {
+        return NULL;  // copy_string will set errno
+    }
+   
+    // Free the element being removed
+    free(vec->data[index].str);
+    
+    // Shift remaining elements left
+    memmove(&vec->data[index], &vec->data[index + 1], 
+            (vec->len - index - 1) * sizeof(string_t));
+   
+    // Clear the last element (which was moved)
+    memset(&vec->data[vec->len - 1], 0, sizeof(string_t));
+    
+    vec->len--;
+    return temp;
+}
+// --------------------------------------------------------------------------------
+
 const string_t* str_vector_index(const string_v* vec, size_t index) {
     if (!vec || !vec->data) {
         errno = EINVAL;

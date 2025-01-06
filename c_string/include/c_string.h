@@ -784,7 +784,7 @@ string_t* pop_front_str_vector(string_v* vec);
 * @return Pointer to removed string_t object, or NULL on error
 *         Sets errno to EINVAL for NULL input or ERANGE if index out of bounds
 */
-string_t* pup_any_str_vector(string_v* vec, size_t index);
+string_t* pop_any_str_vector(string_v* vec, size_t index);
 // --------------------------------------------------------------------------------
 
 /**

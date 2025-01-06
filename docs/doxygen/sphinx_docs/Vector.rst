@@ -343,6 +343,126 @@ insert_str_vector
      or by adding a fixed amount (when size >= VEC_THRESHOLD). This provides efficient
      amortized performance for both small and large vectors.
 
+Drop String Functions
+---------------------
+The string vector provides three different methods for removing elements, each with
+different performance characteristics.
+
+pop_back_str_vector
+~~~~~~~~~~~~~~~~~~~
+.. c:function:: string_t* pop_back_str_vector(string_v* vec)
+
+  Removes and returns the last element from the vector. This is the most efficient
+  removal operation as it requires no element shifting.
+
+  :param vec: Target string vector
+  :returns: Pointer to removed string_t object, or NULL on error
+  :raises: Sets errno to EINVAL for NULL input or empty vector
+  :time complexity: O(1) - Constant time operation
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(2);
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     
+     string_t* popped = pop_back_str_vector(vec);
+     if (popped) {
+         printf("Popped string: %s\n", get_string(popped));
+         printf("Remaining size: %zu\n", str_vector_size(vec));
+         free_string(popped);
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Popped string: second
+     Remaining size: 1
+
+pop_front_str_vector
+~~~~~~~~~~~~~~~~~~~~
+.. c:function:: string_t* pop_front_str_vector(string_v* vec)
+
+  Removes and returns the first element from the vector. Requires shifting all
+  remaining elements left by one position.
+
+  :param vec: Target string vector
+  :returns: Pointer to removed string_t object, or NULL on error
+  :raises: Sets errno to EINVAL for NULL input or empty vector
+  :time complexity: O(n) - Linear time based on vector size
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(2);
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     
+     string_t* popped = pop_front_str_vector(vec);
+     if (popped) {
+         printf("Popped string: %s\n", get_string(popped));
+         printf("New first element: %s\n", 
+                get_string(str_vector_index(vec, 0)));
+         free_string(popped);
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Popped string: first
+     New first element: second
+
+pop_any_str_vector
+~~~~~~~~~~~~~~~~~~
+.. c:function:: string_t* pop_any_str_vector(string_v* vec, size_t index)
+
+  Removes and returns the element at the specified index. Performance varies based
+  on the removal position - removing from the end is fast, while removing from
+  the start or middle requires shifting elements.
+
+  :param vec: Target string vector
+  :param index: Position of element to remove
+  :returns: Pointer to removed string_t object, or NULL on error
+  :raises: Sets errno to EINVAL for NULL input or empty vector, ERANGE for invalid index
+  :time complexity: O(1) to O(n) depending on index position
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(3);
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     push_back_str_vector(vec, "third");
+     
+     // Remove middle element
+     string_t* popped = pop_any_str_vector(vec, 1);
+     if (popped) {
+         printf("Popped string: %s\n", get_string(popped));
+         printf("Remaining strings: %s, %s\n",
+                get_string(str_vector_index(vec, 0)),
+                get_string(str_vector_index(vec, 1)));
+         free_string(popped);
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Popped string: second
+     Remaining strings: first, third
+
+.. note::
+
+  All pop operations maintain vector consistency and properly manage memory of
+  removed elements. The caller is responsible for freeing the returned string_t
+  object using free_string().
+
 Automatic Cleanup 
 -----------------
 In general the C language does not allow automated garbage collection of 
