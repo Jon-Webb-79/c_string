@@ -618,3 +618,64 @@ Macro in place of the ``str_vector_alloc`` function.
   These functions provide the basic mechanisms for inspecting a vector's state
   and accessing its contents. They are fundamental to safe vector manipulation
   and are used extensively by other vector operations.
+
+Vector Sorting Algorithm 
+------------------------
+
+sort_str_vector
+~~~~~~~~~~~~~~~
+.. c:function:: void sort_str_vector(string_v* vec, iter_dir direction)
+
+  Sorts a string vector in either ascending (FORWARD) or descending (REVERSE) order
+  using an optimized QuickSort algorithm with median-of-three pivot selection and
+  insertion sort for small subarrays.
+
+  :param vec: String vector to sort
+  :param direction: FORWARD for ascending, REVERSE for descending order
+  :raises: Sets errno to EINVAL if vec is NULL
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec STRVEC_GBC = init_str_vector(3);
+     push_back_str_vector(vec, "banana");
+     push_back_str_vector(vec, "apple");
+     push_back_str_vector(vec, "cherry");
+     
+     // Sort in ascending order
+     sort_str_vector(vec, FORWARD);
+     for (size_t i = 0; i < str_vector_size(vec); i++) {
+         printf("%s\n", get_string(str_vector_index(vec, i)));
+     }
+     
+     // Sort in descending order
+     sort_str_vector(vec, REVERSE);
+     for (size_t i = 0; i < str_vector_size(vec); i++) {
+         printf("%s\n", get_string(str_vector_index(vec, i)));
+     }
+     
+
+  Output::
+
+     apple
+     banana
+     cherry
+
+     cherry
+     banana
+     apple
+
+  Performance Characteristics
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  * Time Complexity: :math:`O(n log (n))` average case
+  * Space Complexity: :math:`O(log (n))` for recursion stack
+  * Optimizations:
+     - Median-of-three pivot selection for better performance on sorted/nearly sorted data
+     - Insertion sort for small subarrays (less than 10 elements)
+     - Tail recursion elimination to reduce stack usage
+
+  .. note::
+
+     The sort is stable for equal elements, and special handling is provided for
+     empty strings and vectors with duplicate elements.

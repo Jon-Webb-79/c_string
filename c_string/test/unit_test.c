@@ -200,7 +200,16 @@ const struct CMUnitTest test_string_vector[] = {
     cmocka_unit_test(test_pop_any_invalid_index),
     cmocka_unit_test(test_pop_any_empty_vector),
     cmocka_unit_test(test_pop_any_null_vector),
-    cmocka_unit_test(test_pop_any_multiple)
+    cmocka_unit_test(test_pop_any_multiple),
+    cmocka_unit_test(test_sort_empty_vector),
+    cmocka_unit_test(test_sort_single_element),
+    cmocka_unit_test(test_sort_forward_already_sorted),
+    cmocka_unit_test(test_sort_forward_reverse_sorted),
+    cmocka_unit_test(test_sort_reverse_already_sorted),
+    cmocka_unit_test(test_sort_large_vector),
+    cmocka_unit_test(test_sort_duplicate_elements),
+    cmocka_unit_test(test_sort_with_empty_strings),
+    cmocka_unit_test(test_sort_null_vector),
 };
 // ================================================================================ 
 // ================================================================================ 

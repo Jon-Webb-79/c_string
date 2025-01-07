@@ -1381,5 +1381,106 @@ const size_t str_vector_alloc(const string_v* vec) {
     return vec->alloc;
 }
 // ================================================================================
+// ================================================================================ 
+// QUICKSORT
+
+void swap_string(string_t* a, string_t* b) {
+    string_t temp = *a;
+    *a = *b;
+    *b = temp;
+}
+// --------------------------------------------------------------------------------
+
+static string_t* _median_of_three(string_t* a, string_t* b, string_t* c, iter_dir direction) {
+    if ((direction == FORWARD && compare_strings_string(a, b) < 0) ||
+        (direction == REVERSE && compare_strings_string(a, b) > 0)) {
+        if ((direction == FORWARD && compare_strings_string(b, c) < 0) ||
+            (direction == REVERSE && compare_strings_string(b, c) > 0))
+            return b;
+        if ((direction == FORWARD && compare_strings_string(a, c) < 0) ||
+            (direction == REVERSE && compare_strings_string(a, c) > 0))
+            return c;
+        return a;
+    }
+    if ((direction == FORWARD && compare_strings_string(a, c) < 0) ||
+        (direction == REVERSE && compare_strings_string(a, c) > 0))
+        return a;
+    if ((direction == FORWARD && compare_strings_string(b, c) < 0) ||
+        (direction == REVERSE && compare_strings_string(b, c) > 0))
+        return c;
+    return b;
+}
+// --------------------------------------------------------------------------------
+
+static void _insertion_sort(string_t* vec, int low, int high, iter_dir direction) {
+    for (int i = low + 1; i <= high; i++) {
+        string_t key = vec[i];
+        int j = i - 1;
+        while (j >= low && ((direction == FORWARD && compare_strings_string(&vec[j], &key) > 0) ||
+                           (direction == REVERSE && compare_strings_string(&vec[j], &key) < 0))) {
+            vec[j + 1] = vec[j];
+            j--;
+        }
+        vec[j + 1] = key;
+    }
+}
+// --------------------------------------------------------------------------------
+
+static int _partition_string(string_t* vec, int low, int high, iter_dir direction) {
+    // Choose pivot using median of three
+    int mid = low + (high - low) / 2;
+    string_t* pivot_ptr = _median_of_three(&vec[low], &vec[mid], &vec[high], direction);
+    
+    // Move pivot to end
+    if (pivot_ptr != &vec[high])
+        swap_string(pivot_ptr, &vec[high]);
+    
+    string_t pivot = vec[high];
+    int i = (low - 1);
+    
+    for (int j = low; j <= high - 1; j++) {
+        if ((direction == FORWARD && compare_strings_string(&vec[j], &pivot) < 0) ||
+            (direction == REVERSE && compare_strings_string(&vec[j], &pivot) > 0)) {
+            i++;
+            swap_string(&vec[i], &vec[j]);
+        }
+    }
+    swap_string(&vec[i + 1], &vec[high]);
+    return (i + 1);
+}
+// --------------------------------------------------------------------------------
+
+static void _quicksort_str_vector(string_t* vec, int low, int high, iter_dir direction) {
+    while (low < high) {
+        // Use insertion sort for small arrays
+        if (high - low < 10) {
+            _insertion_sort(vec, low, high, direction);
+            break;
+        }
+        
+        int pi = _partition_string(vec, low, high, direction);
+        
+        // Tail recursion elimination
+        if (pi - low < high - pi) {
+            _quicksort_str_vector(vec, low, pi - 1, direction);
+            low = pi + 1;
+        } else {
+            _quicksort_str_vector(vec, pi + 1, high, direction);
+            high = pi - 1;
+        }
+    }
+}
+// --------------------------------------------------------------------------------
+
+void sort_str_vector(string_v* vec, iter_dir direction) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return;
+    }
+    if (vec->len < 2) return;
+    
+    _quicksort_str_vector(vec->data, 0, vec->len - 1, direction);
+}
+// ================================================================================
 // ================================================================================
 // eof

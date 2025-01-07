@@ -589,6 +589,132 @@ void test_pop_any_multiple(void **state) {
    
     free_str_vector(vec);
 }
+// --------------------------------------------------------------------------------
+
+void test_sort_empty_vector(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    sort_str_vector(vec, FORWARD);  // Should handle empty vector gracefully
+    assert_int_equal(str_vector_size(vec), 0);
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_single_element(void **state) {
+    string_v* vec = init_str_vector(1);
+    push_back_str_vector(vec, "test");
+   
+    sort_str_vector(vec, FORWARD);  // Should handle single element gracefully
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "test");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_forward_already_sorted(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "apple");
+    push_back_str_vector(vec, "banana");
+    push_back_str_vector(vec, "cherry");
+   
+    sort_str_vector(vec, FORWARD);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "apple");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "banana");
+    assert_string_equal(get_string(str_vector_index(vec, 2)), "cherry");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_forward_reverse_sorted(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "cherry");
+    push_back_str_vector(vec, "banana");
+    push_back_str_vector(vec, "apple");
+   
+    sort_str_vector(vec, FORWARD);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "apple");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "banana");
+    assert_string_equal(get_string(str_vector_index(vec, 2)), "cherry");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_reverse_already_sorted(void **state) {
+   string_v* vec = init_str_vector(3);
+   push_back_str_vector(vec, "cherry");
+   push_back_str_vector(vec, "banana");
+   push_back_str_vector(vec, "apple");
+   
+   sort_str_vector(vec, REVERSE);
+   assert_string_equal(get_string(str_vector_index(vec, 0)), "cherry");
+   assert_string_equal(get_string(str_vector_index(vec, 1)), "banana");
+   assert_string_equal(get_string(str_vector_index(vec, 2)), "apple");
+   
+   free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_large_vector(void **state) {
+    string_v* vec = init_str_vector(100);
+    // Add strings in random order
+    push_back_str_vector(vec, "zebra");
+    push_back_str_vector(vec, "apple");
+    push_back_str_vector(vec, "monkey");
+    push_back_str_vector(vec, "bear");
+    push_back_str_vector(vec, "Mountain Lion");
+    push_back_str_vector(vec, "elk");
+    // ... add more strings ...
+   
+    sort_str_vector(vec, FORWARD);
+    // Verify order
+    assert_true(compare_strings_string(str_vector_index(vec, 0), 
+                                       (string_t*)str_vector_index(vec, 1)) <= 0);
+    // ... verify more elements ...
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_sort_duplicate_elements(void **state) {
+    string_v* vec = init_str_vector(4);
+    push_back_str_vector(vec, "apple");
+    push_back_str_vector(vec, "banana");
+    push_back_str_vector(vec, "apple");
+    push_back_str_vector(vec, "cherry");
+   
+    sort_str_vector(vec, FORWARD);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "apple");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "apple");
+    assert_string_equal(get_string(str_vector_index(vec, 2)), "banana");
+    assert_string_equal(get_string(str_vector_index(vec, 3)), "cherry");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_sort_with_empty_strings(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "");
+    push_back_str_vector(vec, "apple");
+    push_back_str_vector(vec, "");
+   
+    sort_str_vector(vec, FORWARD);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "");
+    assert_string_equal(get_string(str_vector_index(vec, 2)), "apple");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_sort_null_vector(void **state) {
+    sort_str_vector(NULL, FORWARD);
+    assert_int_equal(errno, EINVAL);
+}
 // ================================================================================
 // ================================================================================
 // eof

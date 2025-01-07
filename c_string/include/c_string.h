@@ -850,6 +850,25 @@ void _free_str_vector(string_v** vec);
 #define s_alloc(dat) _Generic((dat), \
     string_t*: string_alloc, \
     string_v*: str_vector_alloc) (dat)
+// ================================================================================
+// ================================================================================
+
+/**
+ * @brief An enum containing keywords for an iterator 
+ *
+ * This enum contains keywords that are used to describe the order of iteration
+ * within an iterator 
+ *
+ * @attribute FORWARD Keyword to command a forward iteration 
+ * @attribute REVERSE Keyword to command a reverese iteration
+ */
+typedef enum {
+    FORWARD,
+    REVERSE
+} iter_dir;
+// --------------------------------------------------------------------------------
+
+void sort_str_vector(string_v* vec, iter_dir direction);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus
