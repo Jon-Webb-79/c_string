@@ -163,6 +163,14 @@ const struct CMUnitTest test_string[] = {
     cmocka_unit_test(test_string_iterator_empty_string),
     cmocka_unit_test(test_string_iterator_null_string),
     cmocka_unit_test(test_string_iterator_bounds),
+    cmocka_unit_test(test_tokenize_basic),
+    cmocka_unit_test(test_tokenize_multiple_delimiters),
+    cmocka_unit_test(test_tokenize_consecutive_delimiters),
+    cmocka_unit_test(test_tokenize_empty_string),
+    cmocka_unit_test(test_tokenize_no_delimiters_found),
+    cmocka_unit_test(test_tokenize_only_delimiters),
+    cmocka_unit_test(test_tokenize_null_inputs),
+    cmocka_unit_test(test_tokenize_empty_delimiter)
 };
 // --------------------------------------------------------------------------------
 

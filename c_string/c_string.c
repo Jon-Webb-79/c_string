@@ -1481,6 +1481,71 @@ void sort_str_vector(string_v* vec, iter_dir direction) {
     
     _quicksort_str_vector(vec->data, 0, vec->len - 1, direction);
 }
+// --------------------------------------------------------------------------------
+
+string_v* tokenize_string(const string_t* str, const char* delim) {
+    if (!str || !str->str || !delim) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    // Initialize vector to store tokens
+    size_t count = token_count(str, delim);
+    string_v* tokens = init_str_vector(count);
+    if (!tokens) {
+        return NULL;
+    }
+    
+    const char* start = str->str;
+    const char* end = str->str + str->len;
+    const char* current = start;
+    
+    while (current < end) {
+        // Skip delimiters
+        while (current < end) {
+            bool is_delim = false;
+            for (const char* d = delim; *d; d++) {
+                if (*current == *d) {
+                    is_delim = true;
+                    break;
+                }
+            }
+            if (!is_delim) break;
+            current++;
+        }
+        
+        if (current >= end) break;
+        
+        // Find end of token
+        const char* token_end = current;
+        while (token_end < end) {
+            bool is_delim = false;
+            for (const char* d = delim; *d; d++) {
+                if (*token_end == *d) {
+                    is_delim = true;
+                    break;
+                }
+            }
+            if (is_delim) break;
+            token_end++;
+        }
+        
+        // Create temporary null-terminated string for token
+        size_t token_len = token_end - current;
+        char temp[token_len + 1];
+        memcpy(temp, current, token_len);
+        temp[token_len] = '\0';
+        
+        if (!push_back_str_vector(tokens, temp)) {
+            free_str_vector(tokens);
+            return NULL;
+        }
+        
+        current = token_end;
+    }
+    
+    return tokens;
+}
 // ================================================================================
 // ================================================================================
 // eof

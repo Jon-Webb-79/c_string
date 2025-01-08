@@ -24,6 +24,19 @@ format
        size_t alloc;
    } string_t;
 
+string_v
+--------
+The dynamic string vector type that manages memory allocation automatically and 
+provides a safe encapsulation for ``string_t`` data types in an array format.
+This struct is provided as an opaque data structure.
+
+.. code-block:: c
+
+   typedef struct {
+       string_t* data;
+       size_t len;
+       size_t alloc;
+   } string_v;
 
 Core Functions
 --------------
@@ -1533,6 +1546,81 @@ token_count
      Token count: 1
 
 .. note:: The function treats any character in the delim string as a delimiter. For example, if delim is ".,", both period and comma will be treated as delimiters. 
+
+tokenize_string
+~~~~~~~~~~~~~~~
+.. c:function:: string_v* tokenize_string(const string_t* str, const char* delim)
+
+  Splits a string into tokens based on specified delimiter characters.
+  Creates a vector of strings containing each token while preserving
+  the original string.
+
+  :param str: string_t object to tokenize
+  :param delim: String containing delimiter characters (e.g., " ,;")
+  :returns: New string vector containing tokens, or NULL on error
+  :raises: Sets errno to EINVAL for NULL inputs, ENOMEM for allocation failure
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* str = init_string("hello,world;how are you");
+     string_v* tokens = tokenize_string(str, " ,;");
+     
+     if (tokens) {
+         printf("Found %zu tokens:\n", str_vector_size(tokens));
+         for (size_t i = 0; i < str_vector_size(tokens); i++) {
+             printf("%zu: %s\n", i + 1, 
+                    get_string(str_vector_index(tokens, i)));
+         }
+         free_str_vector(tokens);
+     }
+     
+     free_string(str);
+
+  Output::
+
+     Found 5 tokens:
+     1: hello
+     2: world
+     3: how
+     4: are
+     5: you
+
+  Features:
+     * Handles multiple delimiter characters
+     * Skips consecutive delimiters
+     * Preserves original string
+     * Memory efficient - no string duplication
+     * Proper error handling
+
+  Example with multiple delimiters:
+
+  .. code-block:: c
+
+     string_t* str = init_string("name:John,age:30;city:New York");
+     string_v* tokens = tokenize_string(str, ":,;");
+     
+     if (tokens) {
+         for (size_t i = 0; i < str_vector_size(tokens); i += 2) {
+             printf("%s = %s\n", 
+                    get_string(str_vector_index(tokens, i)),
+                    get_string(str_vector_index(tokens, i + 1)));
+         }
+         free_str_vector(tokens);
+     }
+     
+     free_string(str);
+
+  Output::
+
+     name = John
+     age = 30
+     city = New York
+
+  Note:
+     Empty strings and strings containing only delimiters will result
+     in an empty vector (size 0).
 
 String Iterator
 ---------------

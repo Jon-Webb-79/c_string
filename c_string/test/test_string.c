@@ -1707,6 +1707,116 @@ void test_string_iterator_bounds(void **state) {
    
    free_string(str);
 }
+// --------------------------------------------------------------------------------
+
+void test_tokenize_basic(void **state) {
+   string_t* str = init_string("hello world test");
+   string_v* tokens = tokenize_string(str, " ");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 3);
+   assert_string_equal(get_string(str_vector_index(tokens, 0)), "hello");
+   assert_string_equal(get_string(str_vector_index(tokens, 1)), "world");
+   assert_string_equal(get_string(str_vector_index(tokens, 2)), "test");
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_multiple_delimiters(void **state) {
+   string_t* str = init_string("hello,world;test.done");
+   string_v* tokens = tokenize_string(str, ",.;");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 4);
+   assert_string_equal(get_string(str_vector_index(tokens, 0)), "hello");
+   assert_string_equal(get_string(str_vector_index(tokens, 1)), "world");
+   assert_string_equal(get_string(str_vector_index(tokens, 2)), "test");
+   assert_string_equal(get_string(str_vector_index(tokens, 3)), "done");
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_consecutive_delimiters(void **state) {
+   string_t* str = init_string("hello   world,,;test");
+   string_v* tokens = tokenize_string(str, " ,;");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 3);
+   assert_string_equal(get_string(str_vector_index(tokens, 0)), "hello");
+   assert_string_equal(get_string(str_vector_index(tokens, 1)), "world");
+   assert_string_equal(get_string(str_vector_index(tokens, 2)), "test");
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_empty_string(void **state) {
+   string_t* str = init_string("");
+   string_v* tokens = tokenize_string(str, " ");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 0);
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_no_delimiters_found(void **state) {
+   string_t* str = init_string("helloworld");
+   string_v* tokens = tokenize_string(str, " ");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 1);
+   assert_string_equal(get_string(str_vector_index(tokens, 0)), "helloworld");
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_only_delimiters(void **state) {
+   string_t* str = init_string("   ,,,   ");
+   string_v* tokens = tokenize_string(str, " ,");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 0);
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_null_inputs(void **state) {
+   string_v* tokens = tokenize_string(NULL, " ");
+   assert_null(tokens);
+   assert_int_equal(errno, EINVAL);
+   
+   string_t* str = init_string("test");
+   tokens = tokenize_string(str, NULL);
+   assert_null(tokens);
+   assert_int_equal(errno, EINVAL);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_tokenize_empty_delimiter(void **state) {
+   string_t* str = init_string("test");
+   string_v* tokens = tokenize_string(str, "");
+   
+   assert_non_null(tokens);
+   assert_int_equal(str_vector_size(tokens), 1);
+   assert_string_equal(get_string(str_vector_index(tokens, 0)), "test");
+   
+   free_str_vector(tokens);
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof
