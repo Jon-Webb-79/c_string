@@ -187,6 +187,48 @@ pop_dict
          printf("Key was successfully removed\n");
      }
 
+get_dict_keys
+~~~~~~~~~~~~~
+.. c:function:: string_v* get_dict_keys(const dict_t* dict)
+
+   Creates a string vector containing all keys from the dictionary.
+   The order of keys in the vector is not guaranteed.
+
+   :param dict: Source dictionary
+   :returns: New string vector containing all dictionary keys, or NULL on error
+   :raises: Sets errno to EINVAL if dict is NULL, ENOMEM on allocation failure
+
+   Example:
+
+   .. code-block:: c
+
+      dict_t* dict = init_dict();
+      insert_dict(dict, "name", 1.0);
+      insert_dict(dict, "age", 2.0);
+      insert_dict(dict, "city", 3.0);
+      
+      STRVEC_GBC string_v* keys = get_dict_keys(dict);
+      if (keys) {
+          printf("Dictionary keys:\n");
+          for (size_t i = 0; i < str_vector_size(keys); i++) {
+              printf("%s\n", get_string(str_vector_index(keys, i)));
+          }
+      }
+      
+      free_dict(dict);
+
+   Output::
+
+      Dictionary keys:
+      name
+      age
+      city
+
+.. note::
+
+      The returned string vector must be freed using free_str_vector()
+      or can be automatically freed using the STRVEC_GBC macro.
+
 Dictionary Information Functions
 --------------------------------
 

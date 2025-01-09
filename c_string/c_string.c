@@ -1615,50 +1615,7 @@ static bool resize_dict(dict_t* dict, size_t new_size) {
 
     return true;
 }
-// static bool resize_dict(dict_t* dict, size_t new_size) {
-//     if (!dict) {
-//         errno = EINVAL;
-//         return false;
-//     }
-//
-//     // Allocate a new array of dictNode structs
-//     dictNode* new_table = malloc(new_size * sizeof(dictNode));
-//     if (!new_table) {
-//         errno = ENOMEM;
-//         return false;
-//     }
-//
-//     // Initialize the new table
-//     for (size_t i = 0; i < new_size; i++) {
-//         new_table[i].key = NULL;  // Empty bucket
-//         new_table[i].value = 0;  // Default value
-//         new_table[i].next = NULL;
-//     }
-//
-//     // Rehash existing key-value pairs into the new table
-//     for (size_t i = 0; i < dict->alloc; i++) {
-//         dictNode* current = dict->keyValues[i].next; // Traverse the chain in the old table
-//         while (current) {
-//             dictNode* next = current->next; // Save the next node
-//             size_t new_index = hash_function(current->key) % new_size;
-//
-//             // Insert into the new table
-//             current->next = new_table[new_index].next;
-//             new_table[new_index].next = current;
-//
-//             current = next; // Move to the next node in the chain
-//         }
-//     }
-//
-//     // Free the old table
-//     free(dict->keyValues);
-//
-//     // Update the dictionary's fields
-//     dict->keyValues = new_table; // Assign the new array
-//     dict->alloc = new_size;      // Update allocated size
-//
-//     return true;
-// }
+
 // --------------------------------------------------------------------------------
 
 dict_t* init_dict() {
@@ -1741,60 +1698,6 @@ bool insert_dict(dict_t* dict, const char* key, size_t value) {
     
     return true;
 }
-// bool insert_dict(dict_t* dict, char* key, size_t value) {
-//     if (!dict || !key) {
-//         errno = EINVAL;
-//         return false;
-//     }
-//     // Check if resizing is needed
-//     if (dict->hash_size >= dict->alloc * LOAD_FACTOR_THRESHOLD) {
-//         size_t new_alloc = dict->alloc < VEC_THRESHOLD ? dict->alloc * 2 : dict->alloc + VEC_FIXED_AMOUNT;
-//         resize_dict(dict, new_alloc);
-//     } 
-//     
-//     size_t index = hash_function(key) % dict->alloc;
-//
-//     // Check if the key already exists in the hash table
-//     dictNode* current = dict->keyValues[index].next;
-//     while (current) {
-//         if (strcmp(current->key, key) == 0) {
-//             // Key already exists, return control to the calling program
-//             errno = EINVAL;
-//             return false;
-//         }
-//         current = current->next;
-//     }
-//
-//     // Allocate memory for the key
-//     char* new_key = malloc((strlen(key) + 1) * sizeof(char));
-//     if (!new_key) {
-//         errno = ENOMEM;
-//         free(current->key);
-//         return false;
-//     }
-//     strcpy(new_key, key); // Copy the key to the dynamically allocated memory
-//     
-//     // Insert the new key-value pair into the hash table
-//     dictNode* new_node = malloc(sizeof(*new_node));
-//     if (!new_node) {
-//         // Handle memory allocation failure
-//         free(new_key); // Free the allocated key memory
-//         free(current->key);
-//         return false;
-//     }
-//     new_node->key = new_key;
-//     new_node->value = value;
-//     new_node->next = dict->keyValues[index].next;
-//     dict->keyValues[index].next = new_node;
-//     
-//     dict->hash_size++; // Increment the number of key-value pairs
-//     
-//     // Update the size if the index was previously empty
-//     if (dict->keyValues[index].next == new_node) {
-//         dict->len++;
-//     }
-//     return true;
-// }
 // --------------------------------------------------------------------------------
 
 size_t pop_dict(dict_t* dict, char* key) {
@@ -1940,6 +1843,35 @@ bool is_key_value(const dict_t* dict, const char* key) {
     }
     
     return false;  // Key doesn't exist
+}
+// --------------------------------------------------------------------------------
+
+string_v* get_dict_keys(const dict_t* dict) {
+    if (!dict || !dict->keyValues) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    // Initialize string vector
+    string_v* keys = init_str_vector(dict->hash_size);
+    if (!keys) {
+        return NULL;  // errno set by init_str_vector
+    }
+    
+    // Iterate through all buckets
+    for (size_t i = 0; i < dict->alloc; i++) {
+        dictNode* current = dict->keyValues[i].next;
+        while (current) {
+            // Add key to vector
+            if (!push_back_str_vector(keys, current->key)) {
+                free_str_vector(keys);
+                return NULL;
+            }
+            current = current->next;
+        }
+    }
+    
+    return keys;
 }
 // ================================================================================
 // ================================================================================

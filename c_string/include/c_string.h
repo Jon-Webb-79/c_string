@@ -1059,6 +1059,9 @@ void sort_str_vector(string_v* vec, iter_dir direction);
 *     // tokens now contains ["hello", "world", "test"]
 */
 string_v* tokenize_string(const string_t* str, const char* delim);
+// -------------------------------------------------------------------------------- 
+
+string_v* get_dict_keys(const dict_t* dict);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

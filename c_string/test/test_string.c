@@ -1934,7 +1934,75 @@ void test_update_dictionary_error(void **state) {
     assert_int_equal(3, get_dict_value(dict, "Three"));
     free_dict(dict);
 }
+// --------------------------------------------------------------------------------
 
+void test_get_dict_keys_nominal(void **state) {
+    dict_t* dict = init_dict();
+    assert_non_null(dict);
+    
+    // Add some key-value pairs
+    assert_true(insert_dict(dict, "first", 1.0));
+    assert_true(insert_dict(dict, "second", 2.0));
+    assert_true(insert_dict(dict, "third", 3.0));
+    
+    string_v* keys = get_dict_keys(dict);
+    assert_non_null(keys);
+    assert_int_equal(str_vector_size(keys), 3);
+    
+    // Check that all keys are present
+    bool found_first = false, found_second = false, found_third = false;
+    for (size_t i = 0; i < str_vector_size(keys); i++) {
+        const char* key = get_string(str_vector_index(keys, i));
+        if (strcmp(key, "first") == 0) found_first = true;
+        if (strcmp(key, "second") == 0) found_second = true;
+        if (strcmp(key, "third") == 0) found_third = true;
+    }
+    
+    assert_true(found_first && found_second && found_third);
+    
+    free_str_vector(keys);
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+void test_get_dict_keys_empty(void **state) {
+    dict_t* dict = init_dict();
+    assert_non_null(dict);
+    
+    string_v* keys = get_dict_keys(dict);
+    assert_non_null(keys);
+    assert_int_equal(str_vector_size(keys), 0);
+    
+    free_str_vector(keys);
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+void test_get_dict_keys_null(void **state) {
+    string_v* keys = get_dict_keys(NULL);
+    assert_null(keys);
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_get_dict_keys_after_pop(void **state) {
+    dict_t* dict = init_dict();
+    assert_non_null(dict);
+    
+    assert_true(insert_dict(dict, "stay", 1.0));
+    assert_true(insert_dict(dict, "remove", 2.0));
+    
+    // Remove one key
+    assert_int_equal(pop_dict(dict, "remove"), 2.0);
+    
+    string_v* keys = get_dict_keys(dict);
+    assert_non_null(keys);
+    assert_int_equal(str_vector_size(keys), 1);
+    assert_string_equal(get_string(str_vector_index(keys, 0)), "stay");
+    
+    free_str_vector(keys);
+    free_dict(dict);
+}
 // ================================================================================
 // ================================================================================
 // eof

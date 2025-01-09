@@ -229,11 +229,15 @@ const struct CMUnitTest test_dictionary[] = {
 	cmocka_unit_test(test_init_dictionary),
     cmocka_unit_test(test_insert_dictionary),
     cmocka_unit_test(test_pop_dictionary),
-    // #if defined (__GNUC__) || defined(__clang__)
-    //     cmocka_unit_test(test_free_dictionary_gbc),
-    // #endif
-    // cmocka_unit_test(test_update_dictionary),
-    // cmocka_unit_test(test_update_dictionary_error),
+    #if defined (__GNUC__) || defined(__clang__)
+        cmocka_unit_test(test_free_dictionary_gbc),
+    #endif
+    cmocka_unit_test(test_update_dictionary),
+    cmocka_unit_test(test_update_dictionary_error),
+    cmocka_unit_test(test_get_dict_keys_nominal),
+    cmocka_unit_test(test_get_dict_keys_empty),
+    cmocka_unit_test(test_get_dict_keys_null),
+    cmocka_unit_test(test_get_dict_keys_after_pop),
 };
 // ================================================================================ 
 // ================================================================================ 
