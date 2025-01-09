@@ -1817,6 +1817,124 @@ void test_tokenize_empty_delimiter(void **state) {
    free_str_vector(tokens);
    free_string(str);
 }
+// ================================================================================ 
+// ================================================================================ 
+// TEST DICTIONARY 
+
+void test_init_dictionary(void **state) {
+    dict_t* dict = init_dict();
+    assert_int_equal(s_size(dict), 0);
+    assert_int_equal(s_alloc(dict), 3);
+    assert_int_equal(dict_hash_size(dict), 0);
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+void test_insert_dictionary(void **state) {
+    dict_t* dict = init_dict();
+    insert_dict(dict, "One", 1);
+    insert_dict(dict, "Two", 2);
+    insert_dict(dict, "Three", 3);
+    assert_int_equal(s_size(dict), 3);
+    assert_int_equal(s_alloc(dict), 3);
+    assert_int_equal(dict_hash_size(dict), 3);
+    assert_int_equal(1, get_dict_value(dict, "One"));
+    assert_int_equal(2, get_dict_value(dict, "Two"));
+    assert_int_equal(3, get_dict_value(dict, "Three"));
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+void test_pop_dictionary(void **state) {
+    dict_t* dict = init_dict();
+    insert_dict(dict, "One", 1);
+    insert_dict(dict, "Two", 2);
+    insert_dict(dict, "Three", 3);
+    float value = pop_dict(dict, "Three");
+    assert_float_equal(3, value, 1.0e-3);
+    assert_int_equal(s_size(dict), 2);
+    assert_int_equal(s_alloc(dict), 3);
+    assert_int_equal(dict_hash_size(dict), 3);
+    assert_int_equal(1, get_dict_value(dict, "One"));
+    assert_int_equal(2, get_dict_value(dict, "Two"));
+    // Backup original stderr
+    FILE *original_stderr = stderr;
+
+    // Redirect stderr to /dev/null to suppress output
+    stderr = fopen("/dev/null", "w");
+    if (!stderr) {
+        fprintf(original_stderr, "Failed to redirect stderr\n");
+        return;
+    }
+    assert_int_equal(LONG_MAX, get_dict_value(dict, "Three"));
+    // Close the redirected stderr and restore the original stderr
+    fclose(stderr);
+    stderr = original_stderr;
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+#if defined(__GNUC__) || defined(__clang__)
+    void test_free_dictionary_gbc(void **state) {
+        dict_t* dict DICT_GBC = init_dict();
+        insert_dict(dict, "One", 1);
+        insert_dict(dict, "Two", 2);
+        insert_dict(dict, "Three", 3);
+        assert_int_equal(s_size(dict), 3);
+        assert_int_equal(s_alloc(dict), 3);
+        assert_int_equal(dict_hash_size(dict), 3);
+        assert_int_equal(1, get_dict_value(dict, "One"));
+        assert_int_equal(2, get_dict_value(dict, "Two"));
+        assert_int_equal(3, get_dict_value(dict, "Three"));
+    }
+#endif
+// --------------------------------------------------------------------------------
+
+void test_update_dictionary(void **state) {
+    dict_t* dict = init_dict();
+    insert_dict(dict, "One", 1);
+    insert_dict(dict, "Two", 2);
+    insert_dict(dict, "Three", 3);
+    update_dict(dict, "Three", 4);
+    assert_int_equal(s_size(dict), 3);
+    assert_int_equal(s_alloc(dict), 3);
+    assert_int_equal(dict_hash_size(dict), 3);
+    assert_int_equal(1, get_dict_value(dict, "One"));
+    assert_int_equal(2, get_dict_value(dict, "Two"));
+    assert_int_equal(4, get_dict_value(dict, "Three"));
+    free_dict(dict);
+}
+// --------------------------------------------------------------------------------
+
+void test_update_dictionary_error(void **state) {
+    dict_t* dict = init_dict();
+    insert_dict(dict, "One", 1);
+    insert_dict(dict, "Two", 2);
+    insert_dict(dict, "Three", 3);
+    // Backup original stderr
+    FILE *original_stderr = stderr;
+
+    // Redirect stderr to /dev/null to suppress output
+    stderr = fopen("/dev/null", "w");
+    if (!stderr) {
+        fprintf(original_stderr, "Failed to redirect stderr\n");
+        return;
+    }
+    bool test = update_dict(dict, "Five", 4.0);
+    assert_false(test);
+    // Close the redirected stderr and restore the original stderr
+    fclose(stderr);
+    stderr = original_stderr;
+
+    assert_int_equal(s_size(dict), 3);
+    assert_int_equal(s_alloc(dict), 3);
+    assert_int_equal(dict_hash_size(dict), 3);
+    assert_int_equal(1, get_dict_value(dict, "One"));
+    assert_int_equal(2, get_dict_value(dict, "Two"));
+    assert_int_equal(3, get_dict_value(dict, "Three"));
+    free_dict(dict);
+}
+
 // ================================================================================
 // ================================================================================
 // eof

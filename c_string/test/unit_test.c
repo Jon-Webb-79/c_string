@@ -34,7 +34,9 @@ const struct CMUnitTest test_string[] = {
     cmocka_unit_test(test_init_string_special_chars),
     cmocka_unit_test(test_init_string_long),
     cmocka_unit_test(test_getters_null),
-    cmocka_unit_test(test_string_cleanup_gbc),
+    #if defined (__GNUC__) || defined (__clang__)
+        cmocka_unit_test(test_string_cleanup_gbc),
+    #endif
     cmocka_unit_test(test_concat_string_nominal),
     cmocka_unit_test(test_concat_literal_nominal),
     cmocka_unit_test(test_concat_empty_string),
@@ -181,7 +183,9 @@ const struct CMUnitTest test_string_vector[] = {
     cmocka_unit_test(test_str_vector_null_inputs),
     cmocka_unit_test(test_str_vector_empty_string),
     cmocka_unit_test(test_str_vector_multiple_pushes),
-    cmocka_unit_test(test_str_vector_gbc),
+    #if defined (__GNUC__) || defined (__clang__) 
+        cmocka_unit_test(test_str_vector_gbc),
+    #endif
     cmocka_unit_test(test_push_front_empty_vector),
     cmocka_unit_test(test_push_front_existing_elements),
     cmocka_unit_test(test_push_front_reallocation),
@@ -219,6 +223,18 @@ const struct CMUnitTest test_string_vector[] = {
     cmocka_unit_test(test_sort_with_empty_strings),
     cmocka_unit_test(test_sort_null_vector),
 };
+// --------------------------------------------------------------------------------
+
+const struct CMUnitTest test_dictionary[] = {
+	cmocka_unit_test(test_init_dictionary),
+    cmocka_unit_test(test_insert_dictionary),
+    cmocka_unit_test(test_pop_dictionary),
+    // #if defined (__GNUC__) || defined(__clang__)
+    //     cmocka_unit_test(test_free_dictionary_gbc),
+    // #endif
+    // cmocka_unit_test(test_update_dictionary),
+    // cmocka_unit_test(test_update_dictionary_error),
+};
 // ================================================================================ 
 // ================================================================================ 
 int main(int argc, const char * argv[]) {
@@ -227,6 +243,9 @@ int main(int argc, const char * argv[]) {
     if (status != 0) 
         return status;	
     status = cmocka_run_group_tests(test_string_vector, NULL, NULL);
+    if (status != 0) 
+        return status;
+    status = cmocka_run_group_tests(test_dictionary, NULL, NULL);
 	return status;
 }
 // ================================================================================

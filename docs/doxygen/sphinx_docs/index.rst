@@ -51,6 +51,7 @@ C++ language.
 
    C Strings <String>
    String Vector <Vector>
+   Dictionary <Dict>
    Generic Macros <Macros>
 
 Indices and tables

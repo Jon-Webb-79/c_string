@@ -822,6 +822,160 @@ void _free_str_vector(string_v** vec);
      */
     #define STRVEC_GBC __attribute__((cleanup(_free_str_vector)))
 #endif
+// ================================================================================
+// ================================================================================ 
+// DICTIONARY PROTOTYPES
+
+/**
+ * @typedef dict_t
+ * @brief Opaque struct representing a dictionary.
+ *
+ * This structure encapsulates a hash table that maps string keys to int values.
+ * The details of the struct are hidden from the user and managed internally.
+ */
+typedef struct dict_t dict_t;
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Initializes a new dictionary.
+ *
+ * Allocates and initializes a dictionary object with a default size for the hash table.
+ *
+ * @return A pointer to the newly created dictionary, or NULL if allocation fails.
+ */
+dict_t* init_dict();
+// -------------------------------------------------------------------------------- 
+
+/**
+ * @brief Inserts a key-value pair into the dictionary.
+ *
+ * Adds a new key-value pair to the dictionary. If the key already exists, the function
+ * does nothing and returns false. If the dictionary's load factor exceeds a threshold,
+ * it automatically resizes.
+ *
+ * @param dict Pointer to the dictionary.
+ * @param key The key to insert.
+ * @param value The value associated with the key.
+ * @return true if the key-value pair was inserted successfully, false otherwise.
+ */
+bool insert_dict(dict_t* dict, const char* key, size_t value);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Removes a key-value pair from the dictionary.
+ *
+ * Finds the specified key in the dictionary, removes the associated key-value pair,
+ * and returns the value.
+ *
+ * @param dict Pointer to the dictionary.
+ * @param key The key to remove.
+ * @return The value associated with the key if it was found and removed; FLT_MAX otherwise.
+ */
+size_t pop_dict(dict_t* dict,  char* key);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Retrieves the value associated with a key.
+ *
+ * Searches the dictionary for the specified key and returns the corresponding value.
+ *
+ * @param dict Pointer to the dictionary.
+ * @param key The key to search for.
+ * @return The value associated with the key, or FLT_MAX if the key is not found.
+ */
+const size_t get_dict_value(const dict_t* dict, char* key);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Frees the memory associated with the dictionary.
+ *
+ * Releases all memory allocated for the dictionary, including all key-value pairs.
+ *
+ * @param dict Pointer to the dictionary to free.
+ */
+void free_dict(dict_t* dict);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Safely frees a dictionary and sets the pointer to NULL.
+ *
+ * A wrapper around `free_dict` that ensures the dictionary pointer is also set to NULL
+ * after being freed. Useful for preventing dangling pointers.
+ *
+ * @param dict Pointer to the dictionary pointer to free.
+ */
+void _free_dict(dict_t** dict);
+// --------------------------------------------------------------------------------
+
+#if defined(__GNUC__) || defined (__clang__)
+    /**
+     * @macro DICT_GBC
+     * @brief A macro for enabling automatic cleanup of dict_t objects.
+     *
+     * This macro uses the cleanup attribute to automatically call `_free_vector`
+     * when the scope ends, ensuring proper memory management.
+     */
+    #define DICT_GBC __attribute__((cleanup(_free_dict)))
+#endif
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Updates the value associated with a key in the dictionary.
+ *
+ * Searches for the specified key in the dictionary and updates its value.
+ * If the key does not exist, the function takes no action.
+ *
+ * @param dict Pointer to the dictionary.
+ * @param key The key to update.
+ * @param value The new value to associate with the key.
+ */
+bool update_dict(dict_t* dict, char* key, size_t value);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Gets the number of non-empty buckets in the dictionary.
+ *
+ * Returns the total number of buckets in the hash table that contain at least one key-value pair.
+ *
+ * @param dict Pointer to the dictionary.
+ * @return The number of non-empty buckets.
+ */
+const size_t dict_size(const dict_t* dict);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Gets the total capacity of the dictionary.
+ *
+ * Returns the total number of buckets currently allocated in the hash table.
+ *
+ * @param dict Pointer to the dictionary.
+ * @return The total number of buckets in the dictionary.
+ */
+const size_t dict_alloc(const dict_t* dict);
+// --------------------------------------------------------------------------------
+
+/**
+ * @brief Gets the total number of key-value pairs in the dictionary.
+ *
+ * Returns the total number of key-value pairs currently stored in the dictionary.
+ *
+ * @param dict Pointer to the dictionary.
+ * @return The number of key-value pairs.
+ */
+const size_t dict_hash_size(const dict_t* dict);
+// --------------------------------------------------------------------------------
+
+/**
+* @function is_key_value
+* @brief returns true if a key value pair exists in dictionary
+*
+* @param str dict_t object to tokenize
+* @param key A string literal representing a key word
+* @return returns true of key value pair exists, false otherwise.  if char 
+*         pointer or dict_t data type is a null pointer will sett errno 
+*         to ENOMEM and return false
+*/
+bool is_key_value(const dict_t* dict, const char* key);
 // ================================================================================ 
 // ================================================================================ 
 // GENERIC MACROS 
@@ -836,7 +990,8 @@ void _free_str_vector(string_v** vec);
 */
 #define s_size(dat) _Generic((dat), \
     string_t*: string_size, \
-    string_v*: str_vector_size) (dat)
+    string_v*: str_vector_size, \
+    dict_t*: dict_size) (dat)
 // --------------------------------------------------------------------------------
 
 /**
@@ -849,7 +1004,8 @@ void _free_str_vector(string_v** vec);
 */
 #define s_alloc(dat) _Generic((dat), \
     string_t*: string_alloc, \
-    string_v*: str_vector_alloc) (dat)
+    string_v*: str_vector_alloc, \
+    dict_t*: dict_alloc) (dat)
 // ================================================================================
 // ================================================================================
 
@@ -868,9 +1024,40 @@ typedef enum {
 } iter_dir;
 // --------------------------------------------------------------------------------
 
+/**
+* @function sort_str_vector
+* @brief Sorts a string vector in ascending or descending order.
+*
+* Uses an optimized QuickSort algorithm with median-of-three pivot selection
+* and insertion sort for small subarrays. Sort direction is determined by
+* the iter_dir parameter.
+*
+* @param vec string vector to sort
+* @param direction FORWARD for ascending order, REVERSE for descending
+* @return void
+*         Sets errno to EINVAL if vec is NULL or invalid
+*/
 void sort_str_vector(string_v* vec, iter_dir direction);
 // --------------------------------------------------------------------------------
 
+/**
+* @function tokenize_string
+* @brief Splits a string into tokens based on delimiter characters.
+*
+* Creates a vector of strings containing each token found in the input string.
+* Multiple consecutive delimiters are treated as a single delimiter, and
+* the original string is preserved.
+*
+* @param str string_t object to tokenize
+* @param delim string containing delimiter characters (e.g., " ,;")
+* @return string vector containing tokens, or NULL on error
+*         Sets errno to EINVAL for NULL inputs, ENOMEM for allocation failure
+*
+* Example:
+*     string_t* str = init_string("hello,world;test");
+*     string_v* tokens = tokenize_string(str, ",;");
+*     // tokens now contains ["hello", "world", "test"]
+*/
 string_v* tokenize_string(const string_t* str, const char* delim);
 // ================================================================================ 
 // ================================================================================ 

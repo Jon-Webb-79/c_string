@@ -107,7 +107,8 @@ size of both string_t and string_v objects. It automatically selects:
 
 This macro simplifies size queries by providing a consistent interface regardless of
 the underlying type. This Macro may be safely used in place of the 
-:ref:`string_size() <string-size-func>` and :ref:`str_vector_size() <str-vector-size-func>`
+:ref:`string_size() <string-size-func>`, :ref:`str_vector_size() <str-vector-size-func>`
+and :ref:`dict_size() <dict-size-func>`
 
 Example:
 
@@ -132,8 +133,9 @@ size of both string_t and string_v objects. It selects:
 - For string_v*: Uses str_vector_alloc to get allocated vector capacity
 
 This macro is particularly useful for capacity planning and debugging memory usage.
-This Macro may be safely used in place of the :ref:`string_alloc <string-alloc-func>`
-and :ref:`str-vector-alloc() <str-vector-alloc-func>` functions.
+This Macro may be safely used in place of the :ref:`string_alloc <string-alloc-func>`,
+:ref:`str-vector-alloc() <str-vector-alloc-func>`, and 
+and :ref:`dict_alloc() <dict-alloc-func>` functions.
 
 Example:
 
