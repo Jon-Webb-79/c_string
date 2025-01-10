@@ -143,5 +143,5 @@ Contribute to Code Base
 
 Documentation 
 =============
-This code in this repository is further documented at the XXX
-website
+This code in this repository is further documented at the 
+`Read The Docs <https://c-string.readthedocs.io/en/latest/>`_ website
