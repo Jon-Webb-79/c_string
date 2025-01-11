@@ -80,7 +80,7 @@ Building and Testing
 --------------------
 
 Debug Build (with tests)
-~~~~~~~~~~~~~~~~~~~~~~~~
+
 Use the appropriate script for your platform:
 
 **Linux/macOS (bash)**:
