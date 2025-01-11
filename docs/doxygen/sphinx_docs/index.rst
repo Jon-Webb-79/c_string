@@ -79,48 +79,136 @@ addition, this code base requires the use of ``CMake 3.31.3``, ``cmocka``, and
 ``valgrind``.  This code is compiled and written with the C17 standard; however, this 
 should work with any compiler using C11 or later versions.
 
-Installation
-############
-In order to download this repository from `github <https://github.com/Jon-Webb-79/c_string>`_, follow these instructions
+Installation and Build Guide
+############################
 
-#. Ensure you have ``.git`` installed on your computer
+Requirements
+------------
+- Git
+- CMake (version 3.31.3 or later)
+- C compiler (GCC, Clang, or MSVC)
 
-#. Ensure you have ``cmake`` installed on your computer.  This code-base requires 
-   cmake version 3.31.3 or later versions.
+For unit testing:
+- Linux: valgrind (optional, for memory leak checking)
+- All platforms: cmocka testing framework
 
-#. Download this repository to your preferred directory with the following command;
+Getting the Code
+----------------
+Clone the repository:
 
-   .. code-block:: bash 
+.. code-block:: bash
 
-      git clone https://github.com/Jon-Webb-79/c_string.git c_string 
+  git clone https://github.com/Jon-Webb-79/c_string.git
+  cd c_string
 
-#. Navigate to either the bash or zshell scripts directory depending on your 
-   environment with one of the following commands.
+Debug Build (with tests)
+------------------------
 
-   .. code-block:: bash 
+Use the appropriate script for your platform:
 
-      cd c_string/scripts/bash 
-      cd c_string/scripts/zsh 
+**Linux/macOS (bash)**:
 
-#. When developing code, build the code base with the following command.
+.. code-block:: bash
 
-   .. code-block:: bash 
+  cd scripts/bash
+  ./debug.sh
 
-      # If using bash
-      bash debug.sh  
-      # If using zsh 
-      zsh debug.zsh
+**Linux/macOS (zsh)**:
 
-#. Navigate to ``c_string/c_string/build/debug`` to run unit tests 
+.. code-block:: bash
 
-   .. code-block:: bash 
+  cd scripts/zsh
+  ./debug.zsh
 
-      valgrind ./unit_tests 
-      
-#. If all unit tests do not pass with no memory leaks, you may need to contact 
-   the administrator of this git repository.  If they do pass, then you are set 
-   to transform this code-base into a static or dynamic library, or just 
-   copy the ``.c`` and ``.h`` files to your project.
+**Windows**:
+
+.. code-block:: batch
+
+  cd scripts\Windows
+  debug.bat
+
+Run tests:
+
+**Linux (with valgrind)**:
+
+.. code-block:: bash
+
+  cd build/debug
+  valgrind ./unit_tests
+
+**macOS/Windows**:
+
+.. code-block:: bash
+
+  cd build/debug
+  ./unit_tests
+
+Static Library Build
+--------------------
+Creates a static library without tests:
+
+**Linux/macOS (bash)**:
+
+.. code-block:: bash
+
+  cd scripts/bash
+  ./static.sh
+
+**Linux/macOS (zsh)**:
+
+.. code-block:: bash
+
+  cd scripts/zsh
+  ./static.zsh
+
+**Windows**:
+
+.. code-block:: batch
+
+  cd scripts\Windows
+  static.bat
+
+System Installation
+-------------------
+Installs library files to system directories for use in other projects:
+
+**Linux/macOS (requires sudo)**:
+
+.. code-block:: bash
+
+  cd scripts/bash  # or scripts/zsh
+  sudo ./install.sh  # or sudo ./install.zsh
+
+**Windows (requires Administrator)**:
+
+1. Right-click ``scripts\Windows\install.bat``
+2. Select "Run as Administrator"
+
+Usage in Projects
+-----------------
+After installation, you can use the library in three ways:
+
+1. **As System Library**:
+
+  After installation, include in your C files:
+
+  .. code-block:: c
+
+     #include <c_string.h>
+
+2. **As Static Library**:
+
+  Link against the static library created in the build/static directory.
+
+3. **Direct Integration**:
+
+  Copy ``c_string.c`` and ``c_string.h`` directly into your project.
+
+Troubleshooting
+---------------
+- If tests fail, ensure all dependencies are properly installed
+- For Windows builds, ensure you're using an appropriate Visual Studio version
+- For installation issues, verify you have appropriate system permissions
 
 Contribute to Code Base 
 -----------------------
