@@ -14,7 +14,6 @@
 
 #include "include/c_string.h"
 
-#include <asm-generic/errno-base.h>
 #include <errno.h>  // For errno and strerror 
 #include <stdlib.h> // For size_t, malloc, and realloc
 #include <string.h> // For strerror
