@@ -12,7 +12,7 @@
 // ================================================================================
 // Include modules here
 
-#include "include/c_string.h"
+#include "c_string.h"
 
 #include <errno.h>  // For errno and strerror 
 #include <stdlib.h> // For size_t, malloc, and realloc

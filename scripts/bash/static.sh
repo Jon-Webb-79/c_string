@@ -1,20 +1,18 @@
-#!/usr/bin/zsh
+#!/usr/bin/sh
 # ================================================================================
 # ================================================================================
-# - File:    debug.zsh
-# - Purpose: This file contains a script that will build c and c++ software
-#            using CMake
+# - File:    static.sh
+# - Purpose: This file creates a static library version of c_string
 #
 # Source Metadata
 # - Author:  Jonathan A. Webb
-# - Date:    February 26, 2022
+# - Date:    January 11, 2025
 # - Version: 1.0
-# - Copyright: Copyright 2022, Jon Webb Inc.
+# - Copyright: Copyright 2025, Jon Webb Inc.
 # ================================================================================
 # ================================================================================
-
-cmake -S ../../c_string/ -B ../../c_string/build/debug/ -DCMAKE_BUILD_TYPE=Debug
-cmake --build ../../c_string/build/debug/
+cmake -S ../../c_string/ -B ../../c_string/build/static/ -DBUILD_STATIC=ON
+cmake --build ../../c_string/build/static/
 # ================================================================================
 # ================================================================================
 # eof

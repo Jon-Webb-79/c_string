@@ -1,7 +1,7 @@
-#!/usr/bin/zsh
+#!/usr/bin/sh
 # ================================================================================
 # ================================================================================
-# - File:    debug.zsh
+# - File:    debug.sh
 # - Purpose: This file contains a script that will build c and c++ software
 #            using CMake
 #
