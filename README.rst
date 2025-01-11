@@ -118,6 +118,70 @@ Run tests:
   cd build/debug
   ./unit_tests
 
+Static Library Build
+--------------------
+Creates a static library without tests:
+
+**Linux/macOS (bash)**:
+
+.. code-block:: bash
+
+  cd scripts/bash
+  ./static.sh
+
+**Linux/macOS (zsh)**:
+
+.. code-block:: bash
+
+  cd scripts/zsh
+  ./static.zsh
+
+**Windows**:
+
+.. code-block:: batch
+
+  cd scripts\Windows
+  static.bat
+
+System Installation
+-------------------
+Installs library files to system directories for use in other projects:
+
+**Linux/macOS (requires sudo)**:
+
+.. code-block:: bash
+
+  cd scripts/bash  # or scripts/zsh
+  sudo ./install.sh  # or sudo ./install.zsh
+
+**Windows (requires Administrator)**:
+
+1. Right-click ``scripts\Windows\install.bat``
+2. Select "Run as Administrator"
+
+Usage in Projects
+-----------------
+After installation, you can use the library in three ways:
+
+1. **As System Library**:
+  After installation, include in your C files:
+
+  .. code-block:: c
+
+     #include <c_string.h>
+
+2. **As Static Library**:
+  Link against the static library created in the build/static directory.
+
+3. **Direct Integration**:
+  Copy ``c_string.c`` and ``c_string.h`` directly into your project.
+
+Troubleshooting
+---------------
+- If tests fail, ensure all dependencies are properly installed
+- For Windows builds, ensure you're using an appropriate Visual Studio version
+- For installation issues, verify you have appropriate system permissions
+
 Contribute to Code Base 
 -----------------------
 #. Establish a pull request with the git repository owner.
