@@ -85,41 +85,6 @@ Use the appropriate script for your platform:
 
 **Linux/macOS (bash)**:
 
-.. code-block:: bash
-
-  cd scripts/bash
-  ./debug.sh
-
-**Linux/macOS (zsh)**:
-
-.. code-block:: bash
-
-  cd scripts/zsh
-  ./debug.zsh
-
-**Windows**:
-
-.. code-block:: batch
-
-  cd scripts\Windows
-  debug.bat
-
-Run tests:
-
-**Linux (with valgrind)**:
-
-.. code-block:: bash
-
-  cd build/debug
-  valgrind ./unit_tests
-
-**macOS/Windows**:
-
-.. code-block:: bash
-
-  cd build/debug
-  ./unit_tests
-
 Contribute to Code Base 
 -----------------------
 #. Establish a pull request with the git repository owner.
