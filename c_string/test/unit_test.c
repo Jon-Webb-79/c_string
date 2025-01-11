@@ -172,7 +172,16 @@ const struct CMUnitTest test_string[] = {
     cmocka_unit_test(test_tokenize_no_delimiters_found),
     cmocka_unit_test(test_tokenize_only_delimiters),
     cmocka_unit_test(test_tokenize_null_inputs),
-    cmocka_unit_test(test_tokenize_empty_delimiter)
+    cmocka_unit_test(test_tokenize_empty_delimiter),
+    cmocka_unit_test(test_count_words_nominal),
+    cmocka_unit_test(test_count_words_empty_string),
+    cmocka_unit_test(test_count_words_single_word),
+    cmocka_unit_test(test_count_words_nominal),
+    cmocka_unit_test(test_count_words_multiple_delimiters),
+    cmocka_unit_test(test_count_words_null_inputs),
+    cmocka_unit_test(test_count_words_only_delimiters),
+    cmocka_unit_test(test_count_words_case_sensitive),
+    cmocka_unit_test(test_count_words_consecutive_delimiters),
 };
 // --------------------------------------------------------------------------------
 

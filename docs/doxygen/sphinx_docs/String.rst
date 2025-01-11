@@ -1622,6 +1622,77 @@ tokenize_string
      Empty strings and strings containing only delimiters will result
      in an empty vector (size 0).
 
+count_words
+~~~~~~~~~~~
+.. c:function:: dict_t* count_words(const string_t* str, const char* delim)
+
+  Creates a dictionary containing word frequency counts from a string. Each word 
+  becomes a key in the dictionary with its frequency as the value.
+
+  :param str: string_t object to analyze
+  :param delim: String containing delimiter characters (e.g., " ,.;")
+  :returns: New dictionary containing word counts, or NULL on error
+  :raises: Sets errno to EINVAL for NULL inputs or empty string, ENOMEM for allocation failure
+
+  Example:
+
+  .. code-block:: c
+
+     string_t* text = init_string("hello world hello test world");
+     dict_t* counts = count_words(text, " ");
+     
+     if (counts) {
+         // Print word frequencies
+         string_v* words = get_dict_keys(counts);
+         for (size_t i = 0; i < str_vector_size(words); i++) {
+             const char* word = get_string(str_vector_index(words, i));
+             size_t frequency = get_dict_value(counts, word);
+             printf("%s: %zu\n", word, frequency);
+         }
+         
+         free_str_vector(words);
+         free_dict(counts);
+     }
+     
+     free_string(text);
+
+  Output::
+
+     hello: 2
+     world: 2
+     test: 1
+
+  Example with multiple delimiters:
+
+  .. code-block:: c
+
+     string_t* text = init_string("hello,world;hello.test");
+     dict_t* counts = count_words(text, ",.;");
+     
+     // Get total word count
+     size_t total = 0;
+     string_v* words = get_dict_keys(counts);
+     for (size_t i = 0; i < str_vector_size(words); i++) {
+         total += get_dict_value(counts, get_string(str_vector_index(words, i)));
+     }
+     
+     printf("Total words: %zu\n", total);
+     
+     free_str_vector(words);
+     free_dict(counts);
+     free_string(text);
+
+  Output::
+
+     Total words: 4
+
+.. note::
+
+     - Word matching is case-sensitive ("Hello" and "hello" are counted separately)
+     - Empty strings or strings containing only delimiters return empty dictionaries
+     - Multiple consecutive delimiters are treated as a single delimiter
+     - The returned dictionary must be freed using free_dict()
+
 String Iterator
 ---------------
 

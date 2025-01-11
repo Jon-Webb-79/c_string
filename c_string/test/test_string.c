@@ -2003,6 +2003,118 @@ void test_get_dict_keys_after_pop(void **state) {
     free_str_vector(keys);
     free_dict(dict);
 }
+// --------------------------------------------------------------------------------
+
+void test_count_words_nominal(void **state) {
+   string_t* str = init_string("hello world hello test world");
+   dict_t* counts = count_words(str, " ");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 3);  // Three unique words
+   
+   // Check counts
+   assert_int_equal(get_dict_value(counts, "hello"), 2);
+   assert_int_equal(get_dict_value(counts, "world"), 2);
+   assert_int_equal(get_dict_value(counts, "test"), 1);
+   
+   free_dict(counts);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_count_words_empty_string(void **state) {
+   string_t* str = init_string("");
+   dict_t* counts = count_words(str, " ");
+   
+   assert_null(counts);
+   assert_int_equal(errno, EINVAL);
+   
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_count_words_single_word(void **state) {
+   string_t* str = init_string("hello");
+   dict_t* counts = count_words(str, " ");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 1);
+   assert_int_equal(get_dict_value(counts, "hello"), 1);
+   
+   free_dict(counts);
+   free_string(str);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_count_words_multiple_delimiters(void **state) {
+   string_t* str = init_string("hello,world;hello.test,world");
+   dict_t* counts = count_words(str, ",.;");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 3);
+   assert_int_equal(get_dict_value(counts, "hello"), 2);
+   assert_int_equal(get_dict_value(counts, "world"), 2);
+   assert_int_equal(get_dict_value(counts, "test"), 1);
+   
+   free_dict(counts);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_count_words_null_inputs(void **state) {
+   dict_t* counts = count_words(NULL, " ");
+   assert_null(counts);
+   assert_int_equal(errno, EINVAL);
+   
+   string_t* str = init_string("test");
+   counts = count_words(str, NULL);
+   assert_null(counts);
+   assert_int_equal(errno, EINVAL);
+   
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_count_words_only_delimiters(void **state) {
+   string_t* str = init_string("   ");
+   dict_t* counts = count_words(str, " ");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 0);
+   
+   free_dict(counts);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_count_words_case_sensitive(void **state) {
+   string_t* str = init_string("Hello hello HELLO");
+   dict_t* counts = count_words(str, " ");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 3);  // Three different cases counted separately
+   assert_int_equal(get_dict_value(counts, "Hello"), 1);
+   assert_int_equal(get_dict_value(counts, "hello"), 1);
+   assert_int_equal(get_dict_value(counts, "HELLO"), 1);
+   
+   free_dict(counts);
+   free_string(str);
+}
+// --------------------------------------------------------------------------------
+
+void test_count_words_consecutive_delimiters(void **state) {
+   string_t* str = init_string("hello   world,,test");
+   dict_t* counts = count_words(str, " ,");
+   
+   assert_non_null(counts);
+   assert_int_equal(dict_size(counts), 3);
+   assert_int_equal(get_dict_value(counts, "hello"), 1);
+   assert_int_equal(get_dict_value(counts, "world"), 1);
+   assert_int_equal(get_dict_value(counts, "test"), 1);
+   
+   free_dict(counts);
+   free_string(str);
+}
 // ================================================================================
 // ================================================================================
 // eof

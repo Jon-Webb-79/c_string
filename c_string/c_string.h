@@ -1061,7 +1061,29 @@ void sort_str_vector(string_v* vec, iter_dir direction);
 string_v* tokenize_string(const string_t* str, const char* delim);
 // -------------------------------------------------------------------------------- 
 
+/**
+* @function get_dict_keys
+* @brief Returns a string vector of dictionary keys
+*
+* @param dict A dict_t type
+* @return string vector containing dictionary keys, or NULL on error
+*         Sets errno to EINVAL for NULL inputs, ENOMEM for allocation failure
+*/
 string_v* get_dict_keys(const dict_t* dict);
+// --------------------------------------------------------------------------------
+
+/**
+* @function count_words
+* @brief Returns a dictionary of words that occur in a string and the number 
+*        of their occurrances
+*
+* @param dict A dict_t type
+* @param delim A stirng literal of delimters used to parse a string
+* @return A dictionary containing dictionary keys, or NULL on error
+*         Sets errno to EINVAL for NULL inputs, ENOMEM for allocation failure
+*
+*/
+dict_t* count_words(const string_t* str, const char* delim);
 // ================================================================================ 
 // ================================================================================ 
 #ifdef __cplusplus

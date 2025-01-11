@@ -1006,8 +1006,6 @@ void trim_all_whitespace(string_t* str) {
 // ================================================================================ 
 // ================================================================================ 
 
-// --------------------------------------------------------------------------------
-
 static char* _str_end(string_t* s) {
     if (!s || !s->str) {
         return NULL;
@@ -1871,6 +1869,52 @@ string_v* get_dict_keys(const dict_t* dict) {
     }
     
     return keys;
+}
+// --------------------------------------------------------------------------------
+
+dict_t* count_words(const string_t* str, const char* delim) {
+    if (!str || !str->str || str->len == 0 || !delim) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    // Initialize dictionary
+    dict_t* word_count = init_dict();
+    if (!word_count) {
+        return NULL;  // errno set by init_dict
+    }
+    
+    // Get vector of tokens
+    string_v* tokens = tokenize_string(str, delim);
+    if (!tokens) {
+        free_dict(word_count);
+        return NULL;  // errno set by tokenize_string
+    }
+    for (size_t i = 0; i < tokens->len; i++) {
+        printf("%s\n", get_string(str_vector_index(tokens, i)));
+    }
+    // Process each token
+    for (size_t i = 0; i < str_vector_size(tokens); i++) {
+        const char* word = get_string(str_vector_index(tokens, i));
+        if (is_key_value(word_count, word)) {
+            size_t current_count = get_dict_value(word_count, (char*)word);
+            if (!update_dict(word_count, (char*)word, current_count + 1)) {
+                free_str_vector(tokens);
+                free_dict(word_count);
+                return NULL;
+            }
+        }
+        else {
+            if(!insert_dict(word_count, word, 1)) {
+                free_str_vector(tokens);
+                free_dict(word_count);
+                return NULL;
+            }
+        }
+    }
+    
+    free_str_vector(tokens);
+    return word_count;
 }
 // ================================================================================
 // ================================================================================
