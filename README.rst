@@ -67,6 +67,59 @@ For unit testing:
 - Linux: valgrind (optional, for memory leak checking)
 - All platforms: cmocka testing framework
 
+Getting the Code
+----------------
+Clone the repository:
+
+.. code-block:: bash
+
+  git clone https://github.com/Jon-Webb-79/c_string.git
+  cd c_string
+
+Building and Testing
+--------------------
+
+Debug Build (with tests)
+~~~~~~~~~~~~~~~~~~~~~~~~
+Use the appropriate script for your platform:
+
+**Linux/macOS (bash)**:
+
+.. code-block:: bash
+
+  cd scripts/bash
+  ./debug.sh
+
+**Linux/macOS (zsh)**:
+
+.. code-block:: bash
+
+  cd scripts/zsh
+  ./debug.zsh
+
+**Windows**:
+
+.. code-block:: batch
+
+  cd scripts\Windows
+  debug.bat
+
+Run tests:
+
+**Linux (with valgrind)**:
+
+.. code-block:: bash
+
+  cd build/debug
+  valgrind ./unit_tests
+
+**macOS/Windows**:
+
+.. code-block:: bash
+
+  cd build/debug
+  ./unit_tests
+
 Contribute to Code Base 
 -----------------------
 #. Establish a pull request with the git repository owner.
