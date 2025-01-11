@@ -49,13 +49,13 @@ The License is included in the **c_string** package
 Requirements
 ############
 This library is developed and tested on Macintosh and Arch Linux Operating
-Systems.  It is developed with ``gcc 14.2.1`` and ``clang 16.0.6`` compilers. In
+Systems.  It is developed with ``gcc 14.2.1`` and ``clang 16.0.0`` compilers. In
 addition, this code base requires the use of ``CMake 3.31.3``, ``cmocka``, and 
 ``valgrind``.  This code is compiled and written with the C17 standard; however, this 
 should work with any compiler using C11 or later versions.
 
-Installation
-############
+Code Verification
+#################
 In order to download this repository from github, follow these instructions
 
 #. Ensure you have ``.git`` installed on your computer
@@ -69,7 +69,7 @@ In order to download this repository from github, follow these instructions
 
       git clone https://github.com/Jon-Webb-79/c_string.git c_string 
 
-#. Navigate to either the bash or zshell scripts directory depending on your 
+#. Navigate to either the ``bash`` or ``zshell`` scripts directory depending on your 
    environment with one of the following commands.
 
    .. code-block:: bash 
@@ -87,6 +87,12 @@ In order to download this repository from github, follow these instructions
       zsh debug.zsh
 
 #. Navigate to ``c_string/c_string/build/debug`` to run unit tests 
+
+   .. code-block:: bash 
+
+      ./unit_tests 
+
+    Or if using linux, test for memory leaks with 
 
    .. code-block:: bash 
 
