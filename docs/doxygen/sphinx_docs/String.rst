@@ -1693,6 +1693,52 @@ count_words
      - Multiple consecutive delimiters are treated as a single delimiter
      - The returned dictionary must be freed using free_dict()
 
+String Swapping
+---------------
+
+swap_string
+~~~~~~~~~~~
+.. c:function:: void swap_string(string_t* a, string_t* b)
+
+   Swaps the contents of two string_t objects in place. The operation exchanges
+   all internal data including string content, length, and allocation information.
+
+   :param a: Pointer to first string_t object
+   :param b: Pointer to second string_t object
+   :raises: Sets errno to EINVAL if either input is NULL
+
+   Example:
+
+   .. code-block:: c
+
+      string_t* str1 STRING_GBC = init_string("hello");
+      string_t* str2 STRING_GBC = init_string("world");
+      
+      printf("Before swap:\n");
+      printf("str1: %s\n", get_string(str1));
+      printf("str2: %s\n", get_string(str2));
+      
+      swap_string(str1, str2);
+      
+      printf("\nAfter swap:\n");
+      printf("str1: %s\n", get_string(str1));
+      printf("str2: %s\n", get_string(str2));
+
+   Output::
+
+      Before swap:
+      str1: hello
+      str2: world
+
+      After swap:
+      str1: world
+      str2: hello
+
+   Note:
+      The swap operation is efficient as it only exchanges pointers and metadata
+      without copying the actual string contents. Memory ownership is preserved,
+      allowing the strings to be properly freed after swapping.
+
 String Iterator
 ---------------
 

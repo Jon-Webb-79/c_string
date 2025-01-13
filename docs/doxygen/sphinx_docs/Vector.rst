@@ -463,6 +463,105 @@ pop_any_str_vector
   removed elements. The caller is responsible for freeing the returned string_t
   object using free_string().
 
+delete_back_str_vector
+~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: bool delete_back_str_vector(string_v* vec)
+
+  Removes and frees the last element in a string vector.
+
+  :param vec: Target string vector
+  :returns: true if successful, false if vector empty or invalid
+  :raises: Sets errno to EINVAL if vec is NULL or empty
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(2);
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     
+     if (delete_back_str_vector(vec)) {
+         printf("Size after delete: %zu\n", str_vector_size(vec));
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Size after delete: 1
+
+delete_front_str_vector
+~~~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: bool delete_front_str_vector(string_v* vec)
+
+  Removes and frees the first element in a string vector, shifting remaining
+  elements left.
+
+  :param vec: Target string vector
+  :returns: true if successful, false if vector empty or invalid
+  :raises: Sets errno to EINVAL if vec is NULL or empty
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(2);
+     push_back_str_vector(vec, "first");
+     push_back_str_vector(vec, "second");
+     
+     if (delete_front_str_vector(vec)) {
+         printf("Remaining element: %s\n", 
+                get_string(str_vector_index(vec, 0)));
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Remaining element: second
+
+delete_any_str_vector
+~~~~~~~~~~~~~~~~~~~~~
+.. c:function:: bool delete_any_str_vector(string_v* vec, size_t index)
+
+  Removes and frees the element at the specified index, shifting subsequent
+  elements left.
+
+  :param vec: Target string vector
+  :param index: Position of element to delete
+  :returns: true if successful, false if index invalid or vector empty
+  :raises: Sets errno to EINVAL if vec is NULL or empty, ERANGE if index out of bounds
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(3);
+     push_back_str_vector(vec, "one");
+     push_back_str_vector(vec, "two");
+     push_back_str_vector(vec, "three");
+     
+     if (delete_any_str_vector(vec, 1)) {  // Delete "two"
+         printf("Remaining elements: ");
+         for (size_t i = 0; i < str_vector_size(vec); i++) {
+             printf("%s ", get_string(str_vector_index(vec, i)));
+         }
+         printf("\n");
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Remaining elements: one three
+
+Note:
+  These functions free the memory associated with the deleted elements,
+  making them simpler to use than their "pop" counterparts when you don't
+  need the removed values. For cases where you need the removed value,
+  use the corresponding pop functions instead.
+
 Automatic Cleanup 
 -----------------
 In general the C language does not allow automated garbage collection of 
@@ -679,3 +778,49 @@ sort_str_vector
 
      The sort is stable for equal elements, and special handling is provided for
      empty strings and vectors with duplicate elements.
+
+Vector Reversal
+---------------
+
+reverse_str_vector
+~~~~~~~~~~~~~~~~~~
+.. c:function:: void reverse_str_vector(string_v* vec)
+
+   Reverses the order of elements in a string vector. The operation is performed
+   in place without allocating additional memory.
+
+   :param vec: string vector to reverse
+   :raises: Sets errno to EINVAL if vec is NULL or invalid
+
+   Example:
+
+   .. code-block:: c
+
+      string_v* vec STRVEC_GBC = init_str_vector(3);
+      push_back_str_vector(vec, "first");
+      push_back_str_vector(vec, "second");
+      push_back_str_vector(vec, "third");
+      
+      printf("Before: ");
+      for (size_t i = 0; i < str_vector_size(vec); i++) {
+          printf("%s ", get_string(str_vector_index(vec, i)));
+      }
+      printf("\n");
+      
+      reverse_str_vector(vec);
+      
+      printf("After: ");
+      for (size_t i = 0; i < str_vector_size(vec); i++) {
+          printf("%s ", get_string(str_vector_index(vec, i)));
+      }
+      printf("\n");
+      
+   Output::
+
+      Before: first second third
+      After: third second first
+
+.. note::
+
+      The reversal is performed in place, making it memory efficient for
+      large vectors. Empty vectors and single-element vectors remain unchanged.

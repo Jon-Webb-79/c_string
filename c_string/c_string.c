@@ -1350,6 +1350,84 @@ string_t* pop_any_str_vector(string_v* vec, size_t index) {
 }
 // --------------------------------------------------------------------------------
 
+bool delete_back_str_vector(string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return false;
+    }
+    
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return false;
+    }
+    
+    // Clear the popped element for future reuse
+    free(vec->data[vec->len - 1].str);
+    vec->data[vec->len - 1].str = NULL;
+    vec->data[vec->len - 1].len = 0;
+    vec->data[vec->len - 1].alloc = 0;
+    
+    vec->len--;
+    return true;
+}
+// --------------------------------------------------------------------------------
+
+bool delete_front_str_vector(string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    // Free the first element
+    free(vec->data[0].str);
+   
+    // Shift remaining elements left
+    memmove(vec->data, vec->data + 1, (vec->len - 1) * sizeof(string_t));
+   
+    // Clear the last element (which was moved)
+    memset(&vec->data[vec->len - 1], 0, sizeof(string_t));
+   
+    vec->len--;
+    return true;
+}
+// --------------------------------------------------------------------------------
+
+bool delete_any_str_vector(string_v* vec, size_t index) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return false;
+    }
+   
+    if (vec->len == 0) {
+        errno = EINVAL;
+        return false;
+    }
+
+    if (index >= vec->len) {
+        errno = ERANGE;
+        return false;
+    }
+
+    // Free the element being removed
+    free(vec->data[index].str);
+    
+    // Shift remaining elements left
+    memmove(&vec->data[index], &vec->data[index + 1], 
+            (vec->len - index - 1) * sizeof(string_t));
+   
+    // Clear the last element (which was moved)
+    memset(&vec->data[vec->len - 1], 0, sizeof(string_t));
+    
+    vec->len--;
+    return true;
+}
+// --------------------------------------------------------------------------------
+
 const string_t* str_vector_index(const string_v* vec, size_t index) {
     if (!vec || !vec->data) {
         errno = EINVAL;
@@ -1379,11 +1457,30 @@ const size_t str_vector_alloc(const string_v* vec) {
     }
     return vec->alloc;
 }
+// --------------------------------------------------------------------------------
+
+void reverse_str_vector(string_v* vec) {
+    if (!vec || !vec->data) {
+        errno = EINVAL;
+        return;
+    }
+    int i = 0;
+    int j = vec->len - 1;
+    while (i < j) {
+       swap_string(&vec->data[i], &vec->data[j]);
+       i++;
+       j--;
+    }
+}
 // ================================================================================
 // ================================================================================ 
 // QUICKSORT
 
 void swap_string(string_t* a, string_t* b) {
+    if (!a || !b) {
+        errno = EINVAL;
+        return;
+    }
     string_t temp = *a;
     *a = *b;
     *b = temp;

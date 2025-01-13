@@ -788,6 +788,40 @@ string_t* pop_any_str_vector(string_v* vec, size_t index);
 // --------------------------------------------------------------------------------
 
 /**
+* @function delete_back_str_vector
+* @brief Removes the last string in a vector
+*
+* @param vec Source string vector
+* @return true if successful, false otherwise, or NULL if vector empty
+*         Sets errno to EINVAL for NULL input
+*/
+bool delete_back_str_vector(string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+* @function delete_front_str_vector
+* @brief Removes the first string in a vector
+*
+* @param vec Source string vector
+* @return true if successful, false otherwise, or NULL if vector empty
+*         Sets errno to EINVAL for NULL input
+*/
+bool delete_front_str_vector(string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+* @function delete_any_str_vector
+* @brief Removes any string in a vector
+*
+* @param vec Source string vector
+* @param index The index to be deleted
+* @return true if successful, false otherwise, or NULL if vector empty
+*         Sets errno to EINVAL for NULL input
+*/
+bool delete_any_str_vector(string_v* vec, size_t index);
+// --------------------------------------------------------------------------------
+
+/**
 * @function free_str_vector
 * @brief Frees all memory associated with string vector
 *
@@ -822,6 +856,36 @@ void _free_str_vector(string_v** vec);
      */
     #define STRVEC_GBC __attribute__((cleanup(_free_str_vector)))
 #endif
+// -------------------------------------------------------------------------------- 
+
+/**
+ * @function reverse_str_vector
+ * @brief Reverses the order of elements in a string vector in place.
+ *
+ * The function reverses the order of elements by swapping elements from the
+ * beginning and end of the vector until the middle is reached.
+ *
+ * @param vec string vector to reverse
+ * @return void
+ *         Sets errno to EINVAL if vec is NULL or invalid
+ */
+void reverse_str_vector(string_v* vec);
+// --------------------------------------------------------------------------------
+
+/**
+ * @function swap_string
+ * @brief Swaps the contents of two string_t objects.
+ *
+ * Performs an in-place swap of all attributes (str pointer, length, and allocation)
+ * between two string_t objects. The operation maintains memory ownership and
+ * allocation status.
+ *
+ * @param a Pointer to first string_t object
+ * @param b Pointer to second string_t object
+ * @return void
+ *         Sets errno to EINVAL if either input is NULL
+ */
+void swap_string(string_t* a, string_t* b);
 // ================================================================================
 // ================================================================================ 
 // DICTIONARY PROTOTYPES

@@ -715,6 +715,239 @@ void test_sort_null_vector(void **state) {
     sort_str_vector(NULL, FORWARD);
     assert_int_equal(errno, EINVAL);
 }
+// --------------------------------------------------------------------------------
+
+void test_delete_back_nominal(void **state) {
+    string_v* vec = init_str_vector(2);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+   
+    delete_back_str_vector(vec);
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_front_nominal(void **state) {
+    string_v* vec = init_str_vector(2);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+   
+    delete_front_str_vector(vec);
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "second");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_empty_vector(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    delete_back_str_vector(vec);
+    assert_int_equal(errno, EINVAL);
+   
+    delete_front_str_vector(vec);
+    assert_int_equal(errno, EINVAL);
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_multiple_back(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "one");
+    push_back_str_vector(vec, "two");
+    push_back_str_vector(vec, "three");
+   
+    // Pop all elements from back
+    delete_back_str_vector(vec);
+    delete_back_str_vector(vec);
+    delete_back_str_vector(vec);
+   
+    assert_int_equal(str_vector_size(vec), 0);
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_multiple_front(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "one");
+    push_back_str_vector(vec, "two");
+    push_back_str_vector(vec, "three");
+   
+    // Pop all elements from front
+    delete_front_str_vector(vec);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "two");
+   
+    delete_front_str_vector(vec);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "three");
+   
+    delete_front_str_vector(vec);
+   
+    assert_int_equal(str_vector_size(vec), 0);
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_null_vector(void **state) {
+    assert_null(delete_back_str_vector(NULL));
+    assert_int_equal(errno, EINVAL);
+   
+    assert_null(delete_front_str_vector(NULL));
+    assert_int_equal(errno, EINVAL);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_alternating(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "one");
+    push_back_str_vector(vec, "two");
+    push_back_str_vector(vec, "three");
+   
+    delete_back_str_vector(vec);
+    delete_front_str_vector(vec);
+   
+    assert_int_equal(str_vector_size(vec), 1);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "two");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+/* Tests for delete_any_str_vector */
+void test_delete_any_nominal(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+    push_back_str_vector(vec, "third");
+   
+    // Pop middle element
+    delete_any_str_vector(vec, 1);
+   
+    // Verify remaining elements and order
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "third");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_any_first(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+    push_back_str_vector(vec, "third");
+   
+    // Pop first element
+    delete_any_str_vector(vec, 0);
+   
+    // Verify remaining elements shifted correctly
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "second");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "third");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_any_last(void **state) {
+    string_v* vec = init_str_vector(3);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+    push_back_str_vector(vec, "third");
+   
+    // Pop last element
+    delete_any_str_vector(vec, 2);
+   
+    // Verify remaining elements unchanged
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "second");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_delete_any_invalid_index(void **state) {
+    string_v* vec = init_str_vector(2);
+    push_back_str_vector(vec, "first");
+    push_back_str_vector(vec, "second");
+   
+    // Try to delete at invalid index
+    delete_any_str_vector(vec, 2);  // Index == len
+    assert_int_equal(errno, ERANGE);
+   
+    // Verify vector unchanged
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "first");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "second");
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_delete_any_empty_vector(void **state) {
+    string_v* vec = init_str_vector(1);
+   
+    delete_any_str_vector(vec, 0);
+    assert_int_equal(errno, EINVAL);
+   
+    free_str_vector(vec);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_delete_any_null_vector(void **state) {
+    assert_null(delete_any_str_vector(NULL, 0));
+    assert_int_equal(errno, EINVAL);
+}
+// -------------------------------------------------------------------------------- 
+
+void test_delete_any_multiple(void **state) {
+    string_v* vec = init_str_vector(4);
+    assert_int_equal(4, s_alloc(vec));
+    push_back_str_vector(vec, "one");
+    push_back_str_vector(vec, "two");
+    push_back_str_vector(vec, "three");
+    push_back_str_vector(vec, "four");
+   
+    assert_int_equal(4, s_size(vec));
+    // Pop elements in various positions
+    delete_any_str_vector(vec, 1);  // Pop "two"
+   
+    delete_any_str_vector(vec, 2);  // Pop "four"
+   
+    // Verify remaining elements
+    assert_int_equal(str_vector_size(vec), 2);
+    assert_string_equal(get_string(str_vector_index(vec, 0)), "one");
+    assert_string_equal(get_string(str_vector_index(vec, 1)), "three");
+   
+    free_str_vector(vec);
+}
+// --------------------------------------------------------------------------------
+
+void test_reverse_str_vector(void **state) {
+    string_v* vec = init_str_vector(4);
+    assert_int_equal(4, s_alloc(vec));
+    push_back_str_vector(vec, "one");
+    push_back_str_vector(vec, "two");
+    push_back_str_vector(vec, "three");
+    push_back_str_vector(vec, "four");    
+
+    reverse_str_vector(vec);
+
+    char* a[4] = {"four", "three", "two", "one"};
+    for (size_t i = 0; i < s_size(vec); i++) {
+        assert_string_equal(a[i], get_string(str_vector_index(vec, i)));
+    }
+
+    free_str_vector(vec);
+}
 // ================================================================================
 // ================================================================================
 // eof
