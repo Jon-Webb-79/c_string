@@ -22,7 +22,7 @@
 // ================================================================================ 
 // ================================================================================
 
-const float LOAD_FACTOR_THRESHOLD = 0.7;
+static const float LOAD_FACTOR_THRESHOLD = 0.7;
 static const size_t VEC_THRESHOLD = 1 * 1024 * 1024;  // 1 MB
 static const size_t VEC_FIXED_AMOUNT = 1 * 1024 * 1024;  // 1 MB
 static const size_t hashSize = 3;  //  Size fo hash map initi functions
