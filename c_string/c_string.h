@@ -1073,19 +1073,22 @@ bool is_key_value(const dict_t* dict, const char* key);
 // ================================================================================
 // ================================================================================
 
-/**
- * @brief An enum containing keywords for an iterator 
- *
- * This enum contains keywords that are used to describe the order of iteration
- * within an iterator 
- *
- * @attribute FORWARD Keyword to command a forward iteration 
- * @attribute REVERSE Keyword to command a reverese iteration
- */
-typedef enum {
-    FORWARD,
-    REVERSE
-} iter_dir;
+#ifndef ITER_DIR_H
+#define ITER_DIR_H
+    /**
+     * @brief An enum containing keywords for an iterator 
+     *
+     * This enum contains keywords that are used to describe the order of iteration
+     * within an iterator 
+     *
+     * @attribute FORWARD Keyword to command a forward iteration 
+     * @attribute REVERSE Keyword to command a reverese iteration
+     */
+    typedef enum {
+        FORWARD,
+        REVERSE
+    }iter_dir;
+#endif /* ITER_DIR_H*/
 // --------------------------------------------------------------------------------
 
 /**
