@@ -886,6 +886,20 @@ void reverse_str_vector(string_v* vec);
  *         Sets errno to EINVAL if either input is NULL
  */
 void swap_string(string_t* a, string_t* b);
+// -------------------------------------------------------------------------------- 
+
+/**
+* @function binary_search_str_vector
+* @brief Searches a float vector to find the index where a value exists
+*
+* @param vec string vector object
+* @param value The value to search for
+* @param sort_first true if the vector or array needs to be sorted, false otherwise
+* @return The index where a value exists, SIZE_MAX if the value is not in the array.
+*         Sets errno to EINVAL if vec is NULL or invalid, ENODATA if the array is 
+*         not populated
+*/
+size_t binary_search_str_vector(string_v* vec, char* value, bool sort_first);
 // ================================================================================
 // ================================================================================ 
 // DICTIONARY PROTOTYPES

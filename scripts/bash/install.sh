@@ -1,13 +1,13 @@
 #!/usr/bin/sh
 # ================================================================================
 # ================================================================================
-# - File:    install.sh
-# - Purpose: Install c_string library files to system directories
+# - File:    install.zsh
+# - Purpose: Install/Update c_string library files to system directories
 #
 # Source Metadata
 # - Author:  Jonathan A. Webb
 # - Date:    January 11, 2025
-# - Version: 1.0
+# - Version: 1.1
 # - Copyright: Copyright 2025, Jon Webb Inc.
 # ================================================================================
 # ================================================================================
@@ -36,19 +36,43 @@ fi
 mkdir -p "$INCLUDE_DIR"
 mkdir -p "$LIB_DIR"
 
-# Copy header file
+# Create backup directory if needed
+BACKUP_DIR="/tmp/c_string_backup"
+mkdir -p "$BACKUP_DIR"
+
+# Function to backup existing file
+backup_file() {
+    local file=$1
+    local backup_path="$BACKUP_DIR/$(basename $file).$(date +%Y%m%d_%H%M%S)"
+    if [ -f "$file" ]; then
+        cp "$file" "$backup_path"
+        echo "Backed up existing file to $backup_path"
+    fi
+}
+
+# Install/Update header file
+if [ -f "$INCLUDE_DIR/c_string.h" ]; then
+    echo "Updating existing header file..."
+    backup_file "$INCLUDE_DIR/c_string.h"
+fi
+
 cp ../../c_string/c_string.h "$INCLUDE_DIR"
 if [ $? -eq 0 ]; then
-    echo "Header file installed successfully"
+    echo "Header file installed/updated successfully"
 else
     echo "Error installing header file"
     exit 1
 fi
 
-# Copy source file
+# Install/Update source file
+if [ -f "$LIB_DIR/c_string.c" ]; then
+    echo "Updating existing source file..."
+    backup_file "$LIB_DIR/c_string.c"
+fi
+
 cp ../../c_string/c_string.c "$LIB_DIR"
 if [ $? -eq 0 ]; then
-    echo "Source file installed successfully"
+    echo "Source file installed/updated successfully"
 else
     echo "Error installing source file"
     exit 1
@@ -58,7 +82,8 @@ fi
 chmod 644 "$INCLUDE_DIR/c_string.h"
 chmod 644 "$LIB_DIR/c_string.c"
 
-echo "Installation completed successfully"
+echo "Installation/Update completed successfully"
+echo "Backups (if any) are stored in $BACKUP_DIR"
 # ================================================================================
 # ================================================================================
 # eof

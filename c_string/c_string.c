@@ -2013,6 +2013,47 @@ dict_t* count_words(const string_t* str, const char* delim) {
     free_str_vector(tokens);
     return word_count;
 }
+// -------------------------------------------------------------------------------- 
+
+size_t binary_search_str_vector(string_v* vec, char* value, bool sort_first) {
+   if (!vec || !vec->data || !value) {
+       errno = EINVAL;
+       return LONG_MAX;
+   }
+   
+   if (vec->len == 0) {
+       errno = ENODATA;
+       return LONG_MAX;
+   }
+   
+   // Sort if requested
+   if (sort_first) {
+       sort_str_vector(vec, FORWARD);
+   }
+   
+   size_t left = 0;
+   size_t right = vec->len - 1;
+   
+   while (left <= right) {
+       size_t mid = left + (right - left) / 2;
+       int comparison = compare_strings_lit(str_vector_index(vec, mid), value);
+       
+       if (comparison == 0) {
+           return mid;  // Found the value
+       }
+       
+       if (comparison < 0) {
+           left = mid + 1;  // Search right half
+       } else {
+           if (mid == 0) {  // Handle underflow
+               break;
+           }
+           right = mid - 1;  // Search left half
+       }
+   }
+   
+   return LONG_MAX;  // Value not found
+}
 // ================================================================================
 // ================================================================================
 // eof
