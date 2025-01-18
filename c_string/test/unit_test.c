@@ -1,12 +1,13 @@
 // ================================================================================
 // ================================================================================
 // - File:    unit_test.c
-// - Purpose: Describe the file purpose here
+// - Purpose: This file contains an implementation of the cmocka unit test frameword 
+//            for the c_string library
 //
 // Source Metadata
 // - Author:  Jonathan A. Webb
 // - Date:    December 30, 2024
-// - Version: 1.0
+// - Version: 0.1
 // - Copyright: Copyright 2024, Jon Webb Inc.
 // ================================================================================
 // ================================================================================

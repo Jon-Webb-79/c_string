@@ -1,12 +1,13 @@
 // ================================================================================
 // ================================================================================
 // - File:    test_vector.c
-// - Purpose: Describe the file purpose here
+// - Purpose: This file contains implementations for functions that test the 
+//            string vector with a cmocka test framework
 //
 // Source Metadata
 // - Author:  Jonathan A. Webb
 // - Date:    August 31, 2022
-// - Version: 1.0
+// - Version: 0.1
 // - Copyright: Copyright 2022, Jon Webb Inc.
 // ================================================================================
 // ================================================================================

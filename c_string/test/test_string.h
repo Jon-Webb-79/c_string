@@ -1,12 +1,13 @@
 // ================================================================================
 // ================================================================================
-// - File:    test.h
-// - Purpose: Describe the file purpose here
+// - File:    test_string.h
+// - Purpose: This file contains prototypes for functions that will test the  
+//            dynamically allocated string 
 //
 // Source Metadata
 // - Author:  Jonathan A. Webb
 // - Date:    August 31, 2022
-// - Version: 1.0
+// - Version: 0.1
 // - Copyright: Copyright 2022, Jon Webb Inc.
 // ================================================================================
 // ================================================================================
