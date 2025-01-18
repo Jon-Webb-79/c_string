@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to C String documentation!
-==================================
+Welcome to C String documentation! (V0.1)
+=========================================
 C's built-in string handling, based on null-terminated character arrays, while 
 efficient for simple operations, presents several challenges in modern software 
 development:
