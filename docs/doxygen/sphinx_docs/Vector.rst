@@ -824,3 +824,57 @@ reverse_str_vector
 
       The reversal is performed in place, making it memory efficient for
       large vectors. Empty vectors and single-element vectors remain unchanged.
+
+Binary Search Operations
+------------------------
+
+binary_search_str_vector
+^^^^^^^^^^^^^^^^^^^^^^^^
+.. c:function:: size_t binary_search_str_vector(string_v* vec, char* value, bool sort_first)
+
+  Performs a binary search on a string vector to find a specific value.
+  Can optionally sort the vector before searching.
+
+  :param vec: String vector to search
+  :param value: String value to find
+  :param sort_first: true to sort vector before searching, false if already sorted
+  :returns: Index where value was found, or LONG_MAX if not found
+  :raises: Sets errno to EINVAL if inputs invalid, ENODATA if vector empty
+
+  Example:
+
+  .. code-block:: c
+
+     string_v* vec = init_str_vector(3);
+     push_back_str_vector(vec, "apple");
+     push_back_str_vector(vec, "banana");
+     push_back_str_vector(vec, "cherry");
+     
+     // Search in pre-sorted vector
+     size_t index = binary_search_str_vector(vec, "banana", false);
+     if (index != LONG_MAX) {
+         printf("Found 'banana' at index: %zu\n", index);
+     }
+     
+     // Search with automatic sorting
+     push_back_str_vector(vec, "date");
+     push_back_str_vector(vec, "apple");  // Second "apple"
+     
+     index = binary_search_str_vector(vec, "date", true);
+     if (index != LONG_MAX) {
+         printf("Found 'date' at index: %zu\n", index);
+     }
+     
+     free_str_vector(vec);
+
+  Output::
+
+     Found 'banana' at index: 1
+     Found 'date' at index: 3
+
+  Note:
+     - Vector must be sorted in ascending order for binary search to work correctly
+     - If sort_first is false, the function assumes the vector is already sorted
+     - For unsorted vectors, always set sort_first to true
+     - Returns first occurrence if value appears multiple times
+
