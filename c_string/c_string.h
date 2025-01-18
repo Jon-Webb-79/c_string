@@ -1,6 +1,6 @@
 // ================================================================================
 // ================================================================================
-// - File:    cstring.h
+// - File:    c_string.h
 // - Purpose: This file contains the prototypes for functions used in the 
 //            c_string library
 //

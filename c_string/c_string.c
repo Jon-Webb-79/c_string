@@ -1,7 +1,7 @@
 // ================================================================================
 // ================================================================================
-// - File:    cstring.c
-// - Purpose: This file contains the implementation for functions used in the 
+// - File:    c_string.c
+// - purpose: this file contains the implementation for functions used in the 
 //            c_string library
 //
 // Source Metadata
